@@ -53,7 +53,7 @@ def download(url, addon_id, destination, unzip=False, quiet=False):
 		cached_bytes = 0
 		if not quiet:
 			pb = xbmcgui.DialogProgress()
-			pb.create("Downloading",filename,' ', ' ')
+			pb.create( "Downloading",filename )
 		kodi.sleep(150)
 		start = time.time()
 		is_64bit = sys.maxsize > 2**32
@@ -74,7 +74,7 @@ def download(url, addon_id, destination, unzip=False, quiet=False):
 					else: bs = 0
 					if not quiet:
 						percent = int(cached_bytes * 100 / total_bytes)
-						pb.update(percent, "Downloading",filename, format_status(cached_bytes, total_bytes, bs))
+						pb.update( percent, filename + format_status(cached_bytes, total_bytes, bs))
 
 		if not quiet: pb.close()
 		if unzip:
