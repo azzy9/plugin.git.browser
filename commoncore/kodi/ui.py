@@ -57,7 +57,7 @@ def dialog_info(listitem):
 
 def dialog_confirm(heading="", m1="", m2="", m3="", no="", yes="", delay=0):
 	dialog = xbmcgui.Dialog()
-	return dialog.yesno(heading, m1, m2, m3, no, yes, delay)
+	return dialog.yesno(heading, ( m1 + m2 + m3 ), no, yes, delay)
 
 def dialog_input(heading, default='', type=xbmcgui.INPUT_ALPHANUM, option=0, delay=0):
 	if type not in [xbmcgui.INPUT_ALPHANUM, xbmcgui.INPUT_NUMERIC, xbmcgui.INPUT_DATE, xbmcgui.INPUT_TIME, xbmcgui.INPUT_IPADDRESS, xbmcgui.INPUT_PASSWORD]: type = xbmcgui.INPUT_ALPHANUM
@@ -111,17 +111,17 @@ class ProgressBar(xbmcgui.DialogProgress):
 			self._percent = 0
 			self._heading = heading
 			self.create(heading)
-			self.update(0, heading, '')
+			self.update(0, heading)
 			
 	def update_subheading(self, subheading, subheading2="", percent=False):
 		if percent: self._percent = int(percent)
-		self.update(self._percent, self._heading, subheading, subheading2)
+		self.update(self._percent, self._heading + subheading + subheading2)
 		
 	def next(self, subheading, subheading2=""):
 		if not self._silent:
 			self._index = self._index + 1
 			self._percent = int(self._index * 100 / self._total)
-			self.update(self._percent, self._heading, subheading, subheading2)
+			self.update(self._percent, self._heading + subheading + subheading2)
 	
 	def is_canceled(self):
 		return self.iscanceled()
