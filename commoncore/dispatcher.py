@@ -94,7 +94,7 @@ class WeightedDispatcher():
 		return v
 	
 	def validate_result(self, ret):
-		if ret is '' or ret is None or ret is False:
+		if ret == '' or ret == None or ret == False:
 			return False
 		return True
 	
