@@ -4,5 +4,5 @@ The git browser for kodi has been updated to be Python 3 compatible with all the
 <br />
 *Note: this is still not functional*<br />
 To Do:<br />
-- Update the github API to push the key in teh header rather than a query parameter
+- Update the github API to push the key in the header rather than a query parameter
 - Go through properly to make sure there is no errors
