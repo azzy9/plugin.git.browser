@@ -46,8 +46,8 @@ ZIP_DEFLATED = 8
 
 # The "end of central directory" structure, magic number, size, and indices
 # (section V.I in the format document)
-structEndArchive = "<4s4H2LH"
-stringEndArchive = "PK\005\006"
+structEndArchive = b"<4s4H2LH"
+stringEndArchive = b"PK\005\006"
 sizeEndCentDir = struct.calcsize(structEndArchive)
 
 _ECD_SIGNATURE = 0
@@ -66,7 +66,7 @@ _ECD_LOCATION = 9
 # The "central directory" structure, magic number, size, and indices
 # of entries in the structure (section V.F in the format document)
 structCentralDir = "<4s4B4HL2L5H2L"
-stringCentralDir = "PK\001\002"
+stringCentralDir = b"PK\001\002"
 sizeCentralDir = struct.calcsize(structCentralDir)
 
 # indexes of entries in the central directory structure
@@ -92,8 +92,8 @@ _CD_LOCAL_HEADER_OFFSET = 18
 
 # The "local file header" structure, magic number, size, and indices
 # (section V.A in the format document)
-structFileHeader = "<4s2B4HL2L2H"
-stringFileHeader = "PK\003\004"
+structFileHeader = b"<4s2B4HL2L2H"
+stringFileHeader = b"PK\003\004"
 sizeFileHeader = struct.calcsize(structFileHeader)
 
 _FH_SIGNATURE = 0
@@ -110,14 +110,14 @@ _FH_FILENAME_LENGTH = 10
 _FH_EXTRA_FIELD_LENGTH = 11
 
 # The "Zip64 end of central directory locator" structure, magic number, and size
-structEndArchive64Locator = "<4sLQL"
-stringEndArchive64Locator = "PK\x06\x07"
+structEndArchive64Locator = b"<4sLQL"
+stringEndArchive64Locator = b"PK\x06\x07"
 sizeEndCentDir64Locator = struct.calcsize(structEndArchive64Locator)
 
 # The "Zip64 end of central directory" record, magic number, size, and indices
 # (section V.G in the format document)
-structEndArchive64 = "<4sQ2H2L4Q"
-stringEndArchive64 = "PK\x06\x06"
+structEndArchive64 = b"<4sQ2H2L4Q"
+stringEndArchive64 = b"PK\x06\x06"
 sizeEndCentDir64 = struct.calcsize(structEndArchive64)
 
 _CD64_SIGNATURE = 0
@@ -289,13 +289,13 @@ class ZipInfo (object):
 
         # Terminate the file name at the first null byte.  Null bytes in file
         # names are used as tricks by viruses in archives.
-        null_byte = filename.find(chr(0))
+        null_byte = filename.find(bytes([0]))
         if null_byte >= 0:
             filename = filename[0:null_byte]
         # This is used to ensure paths in generated ZIP files always use
         # forward slashes as the directory separator, as required by the
         # ZIP format specification.
-        if os.sep != "/" and os.sep in filename:
+        if os.sep != "/" and os.sep.encode() in filename:
             filename = filename.replace(os.sep, "/")
 
         self.filename = filename        # Normalized file name
@@ -532,7 +532,7 @@ class ZipExtFile(io.BufferedIOBase):
                 raise NotImplementedError("compression type %d" % (self._compress_type,))
         self._unconsumed = ''
 
-        self._readbuffer = ''
+        self._readbuffer = b''
         self._offset = 0
 
         self._universal = 'U' in mode
@@ -622,7 +622,7 @@ class ZipExtFile(io.BufferedIOBase):
         """Read and return up to n bytes.
         If the argument is omitted, None, or negative, data is read and returned until EOF is reached..
         """
-        buf = ''
+        buf = b''
         if n is None:
             n = -1
         while True:
@@ -747,7 +747,7 @@ class ZipFile(object):
         self._comment = ''
 
         # Check if we were passed a file-like object
-        if isinstance(file, basestring):
+        if isinstance(file, str):
             self._filePassed = 0
             self.filename = file
             modeDict = {'r' : 'rb', 'w': 'wb', 'a' : 'r+b'}
@@ -827,7 +827,7 @@ class ZipFile(object):
         self.start_dir = offset_cd + concat
         fp.seek(self.start_dir, 0)
         data = fp.read(size_cd)
-        fp = io.StringIO(data)
+        fp = io.BytesIO(data)
         total = 0
         while total < size_cd:
             centdir = fp.read(sizeCentralDir)
@@ -1040,28 +1040,28 @@ class ZipFile(object):
         """
         # build the destination pathname, replacing
         # forward slashes to platform specific separators.
-        arcname = member.filename.replace('/', os.path.sep)
+        arcname = member.filename.replace(b'/', os.path.sep.encode())
 
         if os.path.altsep:
-            arcname = arcname.replace(os.path.altsep, os.path.sep)
+            arcname = arcname.replace(os.path.altsep.encode(), os.path.sep.encode())
         # interpret absolute pathname as relative, remove drive letter or
         # UNC path, redundant separators, "." and ".." components.
         arcname = os.path.splitdrive(arcname)[1]
-        arcname = os.path.sep.join(x for x in arcname.split(os.path.sep)
+        arcname = os.path.sep.encode().join(x for x in arcname.split(os.path.sep.encode())
                     if x not in ('', os.path.curdir, os.path.pardir))
         if os.path.sep == '\\':
             # filter illegal characters on Windows
-            illegal = ':<>|"?*'
-            if isinstance(arcname, unicode):
+            illegal = b':<>|"?*'
+            if isinstance(arcname, str):
                 table = {ord(c): ord('_') for c in illegal}
             else:
-                table = string.maketrans(illegal, '_' * len(illegal))
+                table = bytes.maketrans(illegal, b'_' * len(illegal))
             arcname = arcname.translate(table)
             # remove trailing dots
-            arcname = (x.rstrip('.') for x in arcname.split(os.path.sep))
-            arcname = os.path.sep.join(x for x in arcname if x)
+            arcname = (x.rstrip(b'.') for x in arcname.split(os.path.sep.encode()))
+            arcname = os.path.sep.encode().join(x for x in arcname if x)
 
-        targetpath = os.path.join(targetpath, arcname)
+        targetpath = os.path.join(targetpath.encode(), arcname)
         targetpath = os.path.normpath(targetpath)
 
         # Create all upper directories if necessary.
@@ -1075,7 +1075,7 @@ class ZipFile(object):
             return targetpath
 
         with self.open(member, pwd=pwd) as source, \
-             file(targetpath, "wb") as target:
+             open(targetpath, "wb") as target:
             shutil.copyfileobj(source, target)
 
         return targetpath
