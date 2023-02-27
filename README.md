@@ -1,6 +1,6 @@
 # Git Browser for Kodi
 
-The git browser for kodi has been updated to python 3 compatible with all the crap removed.<br />
+The git browser for kodi has been updated to be Python 3 compatible with all the crap removed.<br />
 <br />
 *Note: this is still not functional*<br />
 To Do:<br />
