@@ -530,7 +530,7 @@ class ZipExtFile(io.BufferedIOBase):
                 raise NotImplementedError("compression type %d (%s)" % (self._compress_type, descr))
             else:
                 raise NotImplementedError("compression type %d" % (self._compress_type,))
-        self._unconsumed = ''
+        self._unconsumed = b''
 
         self._readbuffer = b''
         self._offset = 0
@@ -1069,7 +1069,7 @@ class ZipFile(object):
         if upperdirs and not os.path.exists(upperdirs):
             os.makedirs(upperdirs)
 
-        if member.filename[-1] == '/':
+        if chr( member.filename[-1] ) == '/':
             if not os.path.isdir(targetpath):
                 os.mkdir(targetpath)
             return targetpath
