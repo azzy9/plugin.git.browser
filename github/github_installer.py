@@ -58,7 +58,9 @@ def update_addons(quiet=True):
                     GitHub_Installer(addon_id, source['url'], full_name, kodi.vfs.join("special://home", "addons"), True, quiet)
                     update_count += 1
 
-    if not quiet: kodi.close_busy_dialog()
+    if not quiet:
+        kodi.close_busy_dialog()
+
     if update_count > 0:
         kodi.notify("Update complete",'Some addons may require restarting kodi.')
     else:
