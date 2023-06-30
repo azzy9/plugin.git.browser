@@ -307,11 +307,11 @@ def install_feed(url, local=False):
 
     from bs4 import BeautifulSoup
     if local:
-            r = kodi.vfs.open(url, "r")
-            if kodi.strings.PY2:
-                zip_ref = zipfile.ZipFile(byte_reader(r.read()))
-            else:
-                zip_ref = zipfile.ZipFile(byte_reader(r.readBytes()))
+        r = kodi.vfs.open(url, "r")
+        if kodi.strings.PY2:
+            zip_ref = zipfile.ZipFile(byte_reader(r.read()))
+        else:
+            zip_ref = zipfile.ZipFile(byte_reader(r.readBytes()))
     else:
         r = requests.get(url, stream=True)
         zip_ref = zipfile.ZipFile(byte_reader(r.content))
@@ -331,11 +331,11 @@ def batch_installer(url, local=False):
         from io import BytesIO as byte_reader
     from bs4 import BeautifulSoup
     if local:
-            r = kodi.vfs.open(url, "r")
-            if kodi.strings.PY2:
-                zip_ref = zipfile.ZipFile(byte_reader(r.read()))
-            else:
-                zip_ref = zipfile.ZipFile(byte_reader(r.readBytes()))
+        r = kodi.vfs.open(url, "r")
+        if kodi.strings.PY2:
+            zip_ref = zipfile.ZipFile(byte_reader(r.read()))
+        else:
+            zip_ref = zipfile.ZipFile(byte_reader(r.readBytes()))
     else:
         r = requests.get(url, stream=True)
         zip_ref = zipfile.ZipFile(byte_reader(r.content))

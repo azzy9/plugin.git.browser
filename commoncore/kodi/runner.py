@@ -30,7 +30,8 @@ __args = {}
 __kwargs = {}
 
 def parse_query(query, q={'mode': 'main'}):
-    if query.startswith('?'): query = query[1:]
+    if query.startswith('?'):
+        query = query[1:]
     queries = parse_qs(query)
     for key in queries:
         if len(queries[key]) == 1:
@@ -93,9 +94,11 @@ def map_directory(items, args=(), kwargs={}):
 
 def execute_api(namespace, api):
     try:
-        if 'args' not in api or api['args'] is None: args = ()
+        if 'args' not in api or api['args'] is None:
+            args = ()
         else: args = list(api['args'])
-        if 'kwargs' not in api or api['kwargs'] is None: kwargs = {}
+        if 'kwargs' not in api or api['kwargs'] is None:
+            kwargs = {}
         else: kwargs = api['kwargs']
         if api['name'] == 'premiumize':
             from commoncore import premiumize
@@ -114,13 +117,14 @@ def execute_api(namespace, api):
         raise e("Invalid API or Method")
 
 def run():
-    if args['mode'] == 'void': return
+    if args['mode'] == 'void':
+        return
     if get_setting('setup_run') != 'true' and 'video' in get_id():
         first_run()
     if mode not in ['search_streams', 'play_stream', 'master_control', 'open_settings', 'auth_realdebrid'] and len(sys.argv) > 2:
         set_property('last.plugin.url', sys.argv[0] + sys.argv[2])
     if True:# try:
-        if args['mode'] == 'addon_settings': 
+        if args['mode'] == 'addon_settings':
             open_settings()
             return
         elif args['mode'] is None or not args['mode']:

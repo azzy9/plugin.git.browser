@@ -31,7 +31,7 @@ PY2 = sys.version_info[0] == 2  #: ``True`` for Python 2
 PY3 = sys.version_info[0] == 3  #: ``True`` for Python 3
 
 def _resolve_path(path):
-    return path.replace('/', os.sep)    
+    return path.replace('/', os.sep)
 
 def confirm(msg='', msg2='', msg3=''):
     dialog = xbmcgui.Dialog()
@@ -57,9 +57,9 @@ def read_file(path, soup=False, json=False, mode=''):
             soup = BeautifulSoup(content)
             return soup
         elif json:
-            try: 
+            try:
                 import simplejson as json
-            except ImportError: 
+            except ImportError:
                 import json
             return json.loads(content)
         else:
@@ -70,7 +70,7 @@ def read_file(path, soup=False, json=False, mode=''):
 
 def write_file(path, content, mode='w', json=False):
     try:
-        if json: 
+        if json:
             import json
             content = json.dumps(content)
 
@@ -92,7 +92,7 @@ def clean_file_name(filename):
     validFilenameChars = "-_.() %s%s" % (string.ascii_letters, string.digits)
     cleanedFilename = unicodedata.normalize('NFKD', filename).encode('ASCII', 'ignore')
     return ''.join(c for c in cleanedFilename if c in validFilenameChars)
-    
+
 def touch(path):
     try:
         if exists(path):
@@ -127,7 +127,7 @@ def path_parts(path):
     filename, file_extension = os.path.splitext(temp[2])
     result = {"scheme": temp[0], "host": temp[1], "path": filename, "extension": file_extension.replace('.', '')}
     return result
-    
+
 def exists(path):
     return xbmcvfs.exists(path)
 
@@ -152,11 +152,13 @@ def ls(path, pattern=None, inlcude_path=False):
             temp = xbmcvfs.listdir(path)
             for test in temp[0]:
                 if s.search(str(test)):
-                    if inlcude_path: test = join(path, test)
+                    if inlcude_path:
+                        test = join(path, test)
                     folders.append(test)
             for test in temp[1]:
                 if s.search(str(test)):
-                    if inlcude_path: test = join(path, test)
+                    if inlcude_path:
+                        test = join(path, test)
                     files.append(test)
             return [folders, files]
         else:
@@ -191,11 +193,12 @@ def rmdir(path, quiet=False):
     if not quiet:
         msg = 'Remove Directory'
         msg2 = 'Please confirm directory removal!'
-        if not confirm(msg, msg2, path): return False
-    try:        
+        if not confirm(msg, msg2, path):
+            return False
+    try:
         xbmcvfs.rmdir(path)
-    except Exception as e:
-        xbmc.log('******** VFS error: %s' % e)
+    except Exception as err_str:
+        xbmc.log('******** VFS error: %s' % err_str)
 
 def rm(path, quiet=False, recursive=False):
     if not exists(path):
@@ -205,7 +208,8 @@ def rm(path, quiet=False, recursive=False):
     if not quiet:
         msg = 'Confirmation'
         msg2 = 'Please confirm directory removal!'
-        if not confirm(msg, msg2, path): return False
+        if not confirm(msg, msg2, path):
+            return False
 
     if not recursive:
         try:
@@ -223,7 +227,7 @@ def rm(path, quiet=False, recursive=False):
         for d in dirs:
             subdir = os.path.join(xbmcvfs.translatePath(path), d)
             rm(subdir, quiet=True, recursive=True)
-        try:            
+        try:
             xbmcvfs.rmdir(path)
         except Exception as e:
             xbmc.log('******** VFS error: %s' % e)
@@ -233,9 +237,10 @@ def rename(src, dest, quiet=False):
     if not quiet:
         msg = 'Confirmation'
         msg2 = 'Please confirm rename file!'
-        if not confirm(msg, msg2, src): return False
+        if not confirm(msg, msg2, src):
+            return False
     xbmcvfs.rename(src, dest)
-    
+
 def cp(src, dest):
     return xbmcvfs.copy(src, dest)
 
@@ -251,7 +256,8 @@ def translate_path(path):
 
 def join(path, filename, preserve=False):
     path = path.replace('/', os.sep)
-    if filename.startswith('/'): filename=filename[1:]
+    if filename.startswith('/'):
+        filename=filename[1:]
     if not preserve:
         translatedpath = os.path.join(xbmcvfs.translatePath( path ), ''+filename+'')
     else:

@@ -60,7 +60,8 @@ def dialog_confirm(heading="", m1="", m2="", m3="", no="", yes="", delay=0):
     return dialog.yesno(heading, ( m1 + m2 + m3 ), no, yes, delay)
 
 def dialog_input(heading, default='', type=xbmcgui.INPUT_ALPHANUM, option=0, delay=0):
-    if type not in [xbmcgui.INPUT_ALPHANUM, xbmcgui.INPUT_NUMERIC, xbmcgui.INPUT_DATE, xbmcgui.INPUT_TIME, xbmcgui.INPUT_IPADDRESS, xbmcgui.INPUT_PASSWORD]: type = xbmcgui.INPUT_ALPHANUM
+    if type not in [xbmcgui.INPUT_ALPHANUM, xbmcgui.INPUT_NUMERIC, xbmcgui.INPUT_DATE, xbmcgui.INPUT_TIME, xbmcgui.INPUT_IPADDRESS, xbmcgui.INPUT_PASSWORD]:
+        type = xbmcgui.INPUT_ALPHANUM
     dialog = xbmcgui.Dialog()
     return dialog.input(heading, default, type, option, delay)
 
@@ -69,7 +70,7 @@ def dialog_select(heading, options, delay=0, preselect=-1, detailed=False):
     index = dialog.select(heading, options, autoclose=delay, preselect=preselect, useDetails=detailed)
     if index >= 0:
         return index
-    else: 
+    else:
         return None
 
 def dialog_multiselect(heading, options, delay=0, preselect=[], detailed=False):
@@ -88,11 +89,12 @@ def dialog_context(options):
     index = dialog.contextmenu(options)
     if index >= 0:
         return index
-    else: 
+    else:
         return None
 
 def dialog_browser(heading, type=BROWSER_TYPES.DIRECTORY, shares="", mask="", thumbs=False, force_folder=False, default="", multiple=False):
-    if shares not in ["", "programs", "video", "pictures", "files", "games", "local"]: shares = ""
+    if shares not in ["", "programs", "video", "pictures", "files", "games", "local"]:
+        shares = ""
     return xbmcgui.Dialog().browse(type, heading, shares, mask, thumbs, force_folder, default, multiple)
 
 
@@ -103,7 +105,7 @@ class ProgressBar(xbmcgui.DialogProgress):
         self._index = 0
         self._total = 0
         self._percent = 0
-        
+
     def new(self, heading, total):
         if not self._silent:
             self._index = 0
@@ -112,22 +114,22 @@ class ProgressBar(xbmcgui.DialogProgress):
             self._heading = heading
             self.create(heading)
             self.update(0, heading)
-            
+
     def update_subheading(self, subheading, subheading2="", percent=False):
-        if percent: self._percent = int(percent)
+        if percent:
+            self._percent = int(percent)
         self.update(self._percent, self._heading + subheading + subheading2)
-        
+
     def next(self, subheading, subheading2=""):
         if not self._silent:
             self._index = self._index + 1
             self._percent = int(self._index * 100 / self._total)
             self.update(self._percent, self._heading + subheading + subheading2)
-    
+
     def is_canceled(self):
         return self.iscanceled()
 
 progress_bar = ProgressBar
-
 
 class ContextMenu:
     def __init__(self):
@@ -135,13 +137,17 @@ class ContextMenu:
 
     def add(self, text, arguments={}, script=False, visible=True, mode=False, priority=50):
         if hasattr(visible, '__call__'):
-            if visible() is False: return
+            if visible() is False:
+                return
         else:
-            if visible is False: return
-        if mode: arguments['mode'] = mode    
+            if visible is False:
+                return
+        if mode:
+            arguments['mode'] = mode
+
         cmd = self._build_url(arguments, script)
         self.commands.append((text, cmd, '', priority))
-    
+
     def _build_url(self, arguments, script):
         for k,v in arguments.items():
             if type(v) is dict:
@@ -153,7 +159,7 @@ class ContextMenu:
                 if isinstance(arguments[k], unicode):
                     arguments[k] = arguments[k].encode('utf-8')
             plugin_url =  "%s?%s" % (sys.argv[0],  urlencode(arguments))
-            
+
         if script:
             cmd = 'XBMC.RunPlugin(%s)' % (plugin_url)
         else:

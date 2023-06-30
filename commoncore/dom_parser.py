@@ -143,9 +143,10 @@ def get_attribute(html, name):
     lst = re.compile(name + '\s*=\s*"([^"]+)"', re.IGNORECASE).findall(html)
     if len(lst) == 0:
         lst = re.compile(name + "\s*=\s*'([^']+)'", re.IGNORECASE).findall(html) # Try with single quotes
-    if len(lst) == 0: return ""
-    else: return lst
-        
+    if len(lst) == 0:
+        return ""
+    return lst
+
 class DomParserException(Exception):
     pass
 
@@ -153,7 +154,7 @@ class DomObject(object):
     _html = ''
     def __init__(self, html):
         self._html = html
-    
+
     def __str__(self):
         return self.html()
 
@@ -163,24 +164,27 @@ class DomObject(object):
     def find_all(self, name=u"", attrs={}):
         lst = self._parse_dom(self._html, name, attrs, True)
         return lst
-    
+
     def find(self, name=u"", attrs={}):
         lst = self._parse_dom(self._html, name, attrs, True)
-        if len(lst) == 0 : return u""
+        if len(lst) == 0 :
+            return u""
         return lst[0]
 
     def content(self, name=u""):
         if not name:
             name = re.search("<(\w+)[^>]*>", self._html).group(1)
         lst = self._parse_dom(self._html, name, {}, False)
-        if len(lst) == 0 : return u""
+        if len(lst) == 0 :
+            return u""
         return lst[0].html()
 
     def attribute(self, name):
         lst = re.compile(name + '\s*=\s*"([^"]+)"', re.IGNORECASE).findall(self._html)
         if len(lst) == 0:
             lst = re.compile(name + "\s*=\s*'([^']+)'", re.IGNORECASE).findall(self._html) # Try with single quotes
-        if len(lst) == 0: return ""
+        if len(lst) == 0:
+            return ""
         else: return lst[0]
 
     def _parse_dom(self, html, name=u"", attrs={}, ret=False):
@@ -307,5 +311,4 @@ class DomObject(object):
         return lst
 
 def parse_html(html):
-    return DomObject(html)    
-        
+    return DomObject(html)

@@ -26,10 +26,11 @@ from commoncore import kodi
 from commoncore.filelock import FileLock
 from commoncore import dom_parser
 from bs4 import BeautifulSoup
-    
+
 vfs = kodi.vfs
 CACHE = vfs.join(kodi.get_profile(), 'API_CACHE')
-if not vfs.exists(CACHE): vfs.mkdir(CACHE, True)
+if not vfs.exists(CACHE):
+    vfs.mkdir(CACHE, True)
 
 try:
     from urllib.parse import urlencode
@@ -62,10 +63,13 @@ class BASE_API():
     headers = {'Content-Type': 'text/html; charset=UTF-8', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'}
     timeout = 3
     def get_user_agent(self):
-        if self.user_agent: return self.user_agent
+        if self.user_agent:
+            return self.user_agent
         user_agent = kodi.get_property('user_agent')
-        try: agent_refresh_time = int(kodi.get_property('agent_refresh_time'))
-        except: agent_refresh_time = 0
+        try:
+            agent_refresh_time = int(kodi.get_property('agent_refresh_time'))
+        except:
+            agent_refresh_time = 0
         if not user_agent or agent_refresh_time < (time.time() - (7 * 24 * 60 * 60)):
             user_agent = self.generate_user_agent()
             kodi.set_property('user_agent', user_agent)
@@ -134,13 +138,13 @@ class BASE_API():
             return dom_parser.parse_html(response)
         return response
 
-    def get_response(self, response):    
+    def get_response(self, response):
         _type = type(response)
         if _type in [TYPES.TEXT, TYPES.UTF8]:
             return response
-        elif _type == TYPES.RESPONSE:
-                return response.text
-        elif _type == TYPES.DICT:
+        if _type == TYPES.RESPONSE:
+            return response.text
+        if _type == TYPES.DICT:
             return str(response)
         return response
 
@@ -153,7 +157,7 @@ class BASE_API():
             kodi.log(response.url)
         traceback.print_stack()
         raise error
-    
+
     def request(self, uri, query=None, data=None, append_base=True, headers=None, auth=None, method=None, timeout=None, encode_data=True):
         self.prepair_query(query)
         request_args = (uri,)
@@ -163,7 +167,8 @@ class BASE_API():
             self.authorize()
         url = self.build_url(uri, query, append_base)
         self.prepair_request()
-        if type(timeout) is not int or type(timeout) is not float: timeout = float(self.timeout)
+        if type(timeout) is not int or type(timeout) is not float:
+            timeout = float(self.timeout)
         try:
             if data is None:
                 if method == 'DELETE':
@@ -186,9 +191,9 @@ class BASE_API():
         return self.handel_error(responseException(response.status_code), response, request_args, request_kwargs)
 
 class CACHABLE_API(BASE_API):
-    
+
     def get_cached_response(self, url, cache_limit):
-        
+
         cache_hash = hashlib.md5(kodi.stringify(url)).hexdigest()
         cache_file = vfs.join(CACHE, cache_hash)
         if vfs.exists(cache_file):
@@ -201,11 +206,11 @@ class CACHABLE_API(BASE_API):
                 response = zlib.decompress(vfs.read_file(cache_file))
                 return response
         return False
-    
+
     def process_response(self, url, response, cache_limit, request_args, request_kwargs):
         self.cache_response(url, response.text, cache_limit)
         return self.get_content(self.get_response(response))
-        
+
     def cache_response(self, url, response, cache_limit):
         if response and cache_limit:
             cache_hash = hashlib.md5(kodi.stringify(url)).hexdigest()
@@ -214,7 +219,7 @@ class CACHABLE_API(BASE_API):
             compressed = zlib.compress(response)
             vfs.write_file(cache_file, compressed)
             vfs.write_file(cache_file+'.ts', str(cache_limit))
-    
+
     def request(self, uri, query=None, data=None, append_base=True, headers=None, auth=None, method=None, timeout=None, encode_data=True, cache_limit=0):
         query = self.prepair_query(query)
         request_args = (uri,)
@@ -237,7 +242,8 @@ class CACHABLE_API(BASE_API):
                 else:
                     response = self.requests.get(url, headers=self.headers, timeout=timeout)
             else:
-                if encode_data: data = json.dumps(data)
+                if encode_data:
+                    data = json.dumps(data)
                 if method == 'PUT':
                     response = self.requests.put(url, data=data, headers=self.headers, timeout=timeout)
                 else:
@@ -305,14 +311,14 @@ class DB_CACHABLE_API(CACHABLE_API):
                     return results[0]
                 return False
             self.get_cached_response = get_cached_response
-        
+
     def connect(self):
         self.dbh = database.connect(self.dbf, check_same_thread=False)
         self.dbc = self.dbh.cursor()
         with self.db_lock:
             try:
                 self.query("SELECT db_version FROM version")
-            except:
+            except Exception:
                 if self.custom_tables:
                     statements = self.create_statements + self.custom_tables
                 else:
@@ -321,14 +327,15 @@ class DB_CACHABLE_API(CACHABLE_API):
                     self.execute(SQL)
                 self.commit()
         self.connected = True
-    
+
     def commit(self):
         self.dbh.commit()
-    
+
     def prepaire_sql(self, SQL):
-        if SQL.upper().startswith('REPLACE INTO'): SQL = 'INSERT OR ' + SQL
+        if SQL.upper().startswith('REPLACE INTO'):
+            SQL = 'INSERT OR ' + SQL
         return SQL
-        
+
     def query(self, SQL, data=[]):
         SQL = self.prepaire_sql(SQL)
         self.dbc.execute(SQL, data)
@@ -337,7 +344,7 @@ class DB_CACHABLE_API(CACHABLE_API):
     def execute(self, SQL, data=[]):
         SQL = self.prepaire_sql(SQL)
         self.dbc.execute(SQL, data)
-            
+
     def get_cached_response(self, url, cache_limit):
         if cache_limit == 0:
             return False
@@ -363,7 +370,7 @@ class DB_CACHABLE_API(CACHABLE_API):
                 self.db_lock.release()
                 return results[0]
         return False
-    
+
     def cache_response(self, url, response, cache_limit):
         if cache_limit == 0:
             return False
@@ -397,6 +404,7 @@ class MYSQL_CACHABLE_API(DB_CACHABLE_API):
         """,
         """INSERT INTO version(db_version) VALUES(1);""",
     ]
+
     def __init__(self, db_host, db_name, db_user, db_pass, db_port=3306):
         self.dsn = {
                 "database": db_name,
@@ -407,28 +415,28 @@ class MYSQL_CACHABLE_API(DB_CACHABLE_API):
                 "buffered": True
         }
         self.connect()
-        
+
     def connect(self):
         import mysql.connector as database
         self.dbh = database.connect(**self.dsn)
         self.dbc = self.dbh.cursor()
         try:
             self.query("SELECT db_version FROM version")
-        except:
+        except Exception:
             if self.custom_tables:
                 statements = self.create_statements + self.custom_tables + ["COMMIT;", "SET autocommit=1;"]
             else:
                 statements = self.create_statements
             for SQL in statements:
                 self.execute(SQL)
-                
+
             self.commit()
         self.connected = True
-    
+
     def prepaire_sql(self, SQL):
         SQL = SQL.replace('?', '%s')
         return SQL
-    
+
     def get_cached_response(self, url, cache_limit):
         if cache_limit == 0:
             return False
@@ -446,10 +454,9 @@ class MYSQL_CACHABLE_API(DB_CACHABLE_API):
         if results:
             return results[0]
         return False
-    
+
     def cache_response(self, url, response, cache_limit):
         if cache_limit == 0:
             return False
         self.execute("REPLACE INTO request_cache(url, response) VALUES(?,?)", [url, response])
-        self.commit()    
-
+        self.commit()

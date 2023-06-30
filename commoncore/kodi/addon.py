@@ -17,7 +17,6 @@
 
 import sys
 import json
-import random
 import xbmc
 import xbmcgui
 import xbmcaddon
@@ -81,18 +80,28 @@ def open_settings(addon_id=None):
         get_addon(addon_id).openSettings()
 
 def get_property(k, id=None):
-    if id is None: id = get_id()
+
+    if id is None:
+        id = get_id()
+
     p = get_window().getProperty('%s.%s' % (id, k))
-    if p.lower() == 'false': return False
-    if p.lower() == 'true': return True
+
+    if p.lower() == 'false':
+        return False
+
+    if p.lower() == 'true':
+        return True
+
     return p
-    
+
 def set_property(k, v, id=None):
-    if id is None: id = get_id()
+    if id is None:
+        id = get_id()
     get_window().setProperty('%s.%s' % (id, k), str(v))
 
 def clear_property(k, id=None):
-    if id is None: id = get_id()
+    if id is None:
+        id = get_id()
     get_window().clearProperty('%s.%s' % (id, k) + k)
 
 def get_plugin_url(queries, addon_id=None):
@@ -119,7 +128,6 @@ def kodi_json_request(method, params, id=1):
 
 def get_current_plugin_url():
     return (sys.argv[0] + sys.argv[2])
-    
 
 def build_plugin_url(queries, addon_id=None):
     return get_plugin_url(queries, addon_id)
@@ -132,14 +140,14 @@ def refresh(plugin_url=None):
     if query:
         set_property('search.query.refesh', query)
         clear_property('search.query')
-        
+
     if plugin_url is None:
         run_command("Container.Refresh")
     else:
         run_command("Container.Refresh(%s)" % plugin_url)
 
 def execute_url(plugin_url):
-    cmd = 'XBMC.RunPlugin(%s)' % (plugin_url) 
+    cmd = 'XBMC.RunPlugin(%s)' % (plugin_url)
     run_command(cmd)
 
 def execute_script(script):
@@ -148,7 +156,7 @@ def execute_script(script):
 
 def execute_addon(addon_id):
     cmd = 'XBMC.RunAddon(%s)' % addon_id
-    run_command(cmd) 
+    run_command(cmd)
 
 def navigate_to(query):
     plugin_url = build_plugin_url(query)
@@ -173,7 +181,7 @@ def get_current_view():
 
 def set_default_view(view):
     set_setting('default_%s_view' % view, get_current_view())
-    
+
 def set_view(view_id, content=None):
     if content is not None:
         xbmcplugin.setContent(HANDLE_ID, content)
@@ -207,7 +215,8 @@ def dict2label(d):
     allowed = ["title", "votes", "rating", "plot", "plotoutline", "playcount", "trailer"]
     info = {}
     for a in allowed:
-        if a in d: info[a] = d[a]
+        if a in d:
+            info[a] = d[a]
     return info
 
 class ContextMenu:
@@ -216,13 +225,16 @@ class ContextMenu:
 
     def add(self, text, arguments={}, script=False, visible=True, mode=False, priority=50):
         if hasattr(visible, '__call__'):
-            if visible() is False: return
+            if visible() is False:
+                return
         else:
-            if visible is False: return
-        if mode: arguments['mode'] = mode    
+            if visible is False:
+                return
+        if mode:
+            arguments['mode'] = mode
         cmd = self._build_url(arguments, script)
         self.commands.append((text, cmd, '', priority))
-    
+
     def _build_url(self, arguments, script):
         for k,v in arguments.items():
             if type(v) is dict:
@@ -234,7 +246,7 @@ class ContextMenu:
                 if isinstance(arguments[k], unicode):
                     arguments[k] = arguments[k].encode('utf-8')
             plugin_url =  "%s?%s" % (sys.argv[0],  urlencode(arguments))
-            
+
         if script:
             cmd = 'XBMC.RunPlugin(%s)' % (plugin_url)
         else:
@@ -245,12 +257,17 @@ class ContextMenu:
         return sorted(self.commands, key=lambda k: k[3])
 
 def make_menu_item(query, infolabels, total_items=0, icon='', image='', fanart='', replace_menu=True, menu=None, visible=True, format=None, in_progress=False):
-    if 'display' in infolabels: infolabels['title'] = infolabels['display']
+
+    if 'display' in infolabels:
+        infolabels['title'] = infolabels['display']
+
     if hasattr(visible, '__call__'):
-        if visible() is False: return False, False
+        if visible() is False:
+            return False, False
     else:
-        if visible is False: return False, False
-    
+        if visible is False:
+            return False, False
+
     if not fanart and 'fanart' in infolabels and infolabels['fanart']:
         fanart = infolabels['fanart']
     elif not fanart:
@@ -259,18 +276,24 @@ def make_menu_item(query, infolabels, total_items=0, icon='', image='', fanart='
         text = format % infolabels['title']
     else:
         text = infolabels['title']
-    
+
     if icon:
         image = vfs.join(ARTWORK, icon)
-    
+
     listitem = xbmcgui.ListItem(text)
     listitem.setArt({'icon': image, 'thumbnail': image})
     cast = infolabels.pop('cast', None)
     try:
-        if cast is not None: listitem.setCast(cast)
-    except: pass
+        if cast is not None:
+            listitem.setCast(cast)
+    except Exception:
+        pass
+
     watched = False
-    if 'playcount' in infolabels and int(infolabels['playcount']) > 0: watched = True 
+
+    if 'playcount' in infolabels and int(infolabels['playcount']) > 0:
+        watched = True
+
     if not watched and in_progress:
         listitem.setProperty('totaltime', '999999')
         listitem.setProperty('resumetime', "1")
@@ -280,7 +303,7 @@ def make_menu_item(query, infolabels, total_items=0, icon='', image='', fanart='
     listitem.setProperty('fanart_image', fanart)
     if menu is None:
         menu = ContextMenu()
-    
+
     menu.add("Addon Settings", {"mode": "addon_settings"}, script=True)
     listitem.addContextMenuItems(menu.get(), replaceItems=replace_menu)
     plugin_url = get_plugin_url(query)
@@ -294,4 +317,3 @@ def add_menu_item(query, infolabels, total_items=0, icon='', image='', fanart=''
 def add_video_item(query, infolabels, total_items=0, icon='', image='', fanart='', replace_menu=True, menu=None, format=None, random_url=True, in_progress=False):
     plugin_url, listitem = make_menu_item(query, infolabels, total_items, icon, image, fanart, replace_menu, menu, True, format, in_progress)
     xbmcplugin.addDirectoryItem(HANDLE_ID, plugin_url, listitem, isFolder=False, totalItems=total_items)
-    

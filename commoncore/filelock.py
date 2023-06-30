@@ -354,7 +354,7 @@ class WindowsFileLock(BaseFileLock):
             except (IOError, OSError):
                 try:
                     os.close(fd)
-                except: 
+                except Exception:
                     fd.close()
             else:
                 self._lock_file_fd = fd
@@ -366,12 +366,13 @@ class WindowsFileLock(BaseFileLock):
         msvcrt.locking(fd, msvcrt.LK_UNLCK, 1)
         try:
             os.close(fd)
-        except: 
+        except Exception:
             fd.close()
+
         try:
             os.remove(self._lock_file)
-        # Probably another instance of the application
-        # that acquired the file lock.
+            # Probably another instance of the application
+            # that acquired the file lock.
         except OSError:
             pass
         return None

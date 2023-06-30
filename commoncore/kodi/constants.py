@@ -30,7 +30,8 @@ def get_setting(k, addon_id=None):
         return xbmcaddon.Addon(addon_id).getSetting(k)
 
 def set_setting(k, v, addon_id=None):
-    if not isinstance(v, str): v = str(v)
+    if not isinstance(v, str):
+        v = str(v)
     if addon_id is None:
         return __set_setting(k, v)
     else:
@@ -52,13 +53,13 @@ try:
     client_host = '127.0.0.1'
     client_port = get_setting('control_port', 'service.fanart.proxy')
     client_protocol = get_setting('control_protocol', 'service.fanart.proxy')
-    BASE_FANART_URL = '%s://%s:%s/api/images' % (client_protocol, client_host, client_port) 
+    BASE_FANART_URL = '%s://%s:%s/api/images' % (client_protocol, client_host, client_port)
 except Exception:
     BASE_FANART_URL = ''
 
 DEFAULT_VIEW = 550
 DEFAULT_VIEWS = enum(
-    DEFAULT= DEFAULT_VIEW, 
+    DEFAULT= DEFAULT_VIEW,
     LIST= int(get_setting('default_list_view')) if get_setting('default_list_view') else DEFAULT_VIEW,
     FOLDER= int(get_setting('default_folder_view')) if get_setting('default_folder_view') else DEFAULT_VIEW,
     MOVIES= int(get_setting('default_movie_view')) if get_setting('default_movie_view') else DEFAULT_VIEW,

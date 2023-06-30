@@ -43,7 +43,7 @@ class BASEDatabase:
         self.__connected = False
 
     def connect(self):
-        if self.__connected is False: 
+        if self.__connected is False:
             self._connect()
 
     def commit(self):
@@ -68,14 +68,16 @@ class BASEDatabase:
     def ignore_errors(self, e):
         err = str(e)
         for test in self.__ignore_errors:
-            if test.search(err): return True
+            if test.search(err):
+                return True
 
     def handel_error(self, error):
         traceback.print_stack()
         raise error
 
     def prepaire_sql(self, SQL):
-        if regex_replace.search(SQL): SQL = 'INSERT OR ' + SQL
+        if regex_replace.search(SQL):
+            SQL = 'INSERT OR ' + SQL
         return SQL
 
     def query(self, SQL, data=None,force_double_array=True, quiet=False):
@@ -147,7 +149,8 @@ class BASEDatabase:
             for SQL in sql_stmts:
                 if SQL is not None and len(SQL.strip()) > 0:
                     self.execute(SQL, quiet=True)
-            if commit: self.commit()
+            if commit:
+                self.commit()
             return True
         else:
             return False
@@ -161,8 +164,10 @@ class SQLiteDatabase(BASEDatabase):
         self.db_file = db_file
         self.db_lock = filelock.FileLock(db_file + ".lock")
         self.db_version = version
-        if connect: self._connect()
-        if self.do_init(): self._initialize()
+        if connect:
+            self._connect()
+        if self.do_init():
+            self._initialize()
 
     def commit(self):
         with self.db_lock:
@@ -266,11 +271,12 @@ class SQLiteDatabase(BASEDatabase):
         if self.quiet is False:
             kodi.log("Connecting to SQLite on: " + self.db_file)
         directory = kodi.vfs.dirname(self.db_file)
-        if not kodi.vfs.exists(directory): kodi.vfs.mkdir(directory)
+        if not kodi.vfs.exists(directory):
+            kodi.vfs.mkdir(directory)
         self.DBH = database.connect(self.db_file, check_same_thread=False)
         try:
             self.DBC = self.DBH.cursor()
-            self.__connected = True    
+            self.__connected = True
         except Exception as e:
             self.handel_error(DatabaseException("SQLite Database Error: %s" % e))
             kodi.log("SQLite Database Error: %s" % e)
@@ -288,11 +294,15 @@ class MySQLDatabase(BASEDatabase):
         self.password = password
         self.port = port
         self.db_version = version
-        if connect: self._connect()
-        if self.do_init(): self._initialize()    
-    
+
+        if connect:
+            self._connect()
+
+        if self.do_init():
+            self._initialize()
+
     def _connect(self):
-        try:    
+        try:
             import mysql.connector as database
             dsn = {
                     "database": self.dbname,
@@ -347,10 +357,10 @@ class MySQLDatabase(BASEDatabase):
                 return rows[0]
             else:
                 return rows
-        except Exception as e:
-            if self.quiet is False or quiet is False and not self.ignore_errors(e):
-                self.handel_error(DatabaseException("MySQL Database Error: %s" % e))
-    
+        except Exception as err_str:
+            if self.quiet is False or quiet is False and not self.ignore_errors(err_str):
+                self.handel_error(DatabaseException("MySQL Database Error: %s" % err_str))
+
     def query_assoc(self, SQL, data=None, force_double_array=True, quiet=False):
         try:
             if data:

@@ -17,7 +17,8 @@
 
 import re
 import sys
-import time
+
+RE_COLOR = re.compile(r"(\[COLOR\s+[a-zA-Z]+\]|\[\/COLOR\])")
 
 def utf8(string):
     try:
@@ -29,21 +30,32 @@ def utf8(string):
     return string
 
 def format_size(num, suffix='B', split=False):
+
+    """ Formats storage size """
+
     num = float(num)
     for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
         if abs(num) < 1024.0:
-            if split: return num, unit, suffix
+            if split:
+                return num, unit, suffix
             return "%3.1f %s%s" % (num, unit, suffix)
         num /= 1024.0
-    if split: return num, unit, suffix
+    if split:
+        return num, unit, suffix
     return "%.1f %s%s" % (num, 'Y', suffix)
 
 def size_to_bytes(num, unit='B'):
+
     unit = unit.upper()
-    if unit.endswith('B'): unit = unit[:-1]
+    if unit.endswith('B'):
+        unit = unit[:-1]
     units = ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']
-    try: mult = pow(1024, units.index(unit))
-    except: mult = sys.maxint
+
+    try:
+        mult = pow(1024, units.index(unit))
+    except Exception:
+        mult = sys.maxint
+
     return int(float(num) * mult)
 
 def format_time(seconds, long=False):
@@ -52,12 +64,10 @@ def format_time(seconds, long=False):
     if minutes > 60 or long:
         hours, minutes = divmod(minutes, 60)
         return "%02d:%02d:%02d" % (hours, minutes, seconds)
-    else:
-        return "%02d:%02d" % (minutes, seconds)
+    return "%02d:%02d" % (minutes, seconds)
 
-re_color = re.compile("(\[COLOR\s+[a-zA-Z]+\]|\[\/COLOR\])")
 def format_color(string, color):
-    string = re_color.sub('', string)
+    string = RE_COLOR.sub('', string)
     return "[COLOR %s]%s[/COLOR]" % (color, string)
 
 def highlight(string, subject, color):
@@ -65,7 +75,11 @@ def highlight(string, subject, color):
     return re.sub(subject, formated, string, re.IGNORECASE)
 
 def format_trailer(trailer_url):
-    if not trailer_url: return trailer_url
+
+    if not trailer_url:
+        return trailer_url
+
     match = re.search('\?v=(.*)', trailer_url)
+
     if match:
-        return 'plugin://plugin.video.youtube/?action=play_video&videoid=%s' % (match.group(1))    
+        return 'plugin://plugin.video.youtube/?action=play_video&videoid=%s' % (match.group(1))

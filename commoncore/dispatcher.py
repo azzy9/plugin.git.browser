@@ -42,9 +42,12 @@ class FunctionDispatcher():
 
     def __coerce(self, v):
         test = v.lower()
-        if test == 'none': return None
-        if test == 'false': return False
-        if test == "true": return True
+        if test == 'none':
+            return None
+        if test == 'false':
+            return False
+        if test == "true":
+            return True
         return v
 
     def error(self):
@@ -54,7 +57,8 @@ class FunctionDispatcher():
         if mode is None or mode == '' or mode is False:
             mode = 'default'
         if mode in self.__functions:
-            if condition is not None and condition is False: return
+            if condition is not None and condition is False:
+                return
             args = self.__args[mode]
             kwargs = self.__kwargs[mode]
             return self.__functions[mode](*args, **kwargs)
@@ -89,9 +93,12 @@ class WeightedDispatcher():
 
     def __coerce(self, v):
         test = v.lower()
-        if test == 'none': return None
-        if test == 'false': return False
-        if test == "true": return True
+        if test == 'none':
+            return None
+        if test == 'false':
+            return False
+        if test == "true":
+            return True
         return v
 
     def validate_result(self, ret):
