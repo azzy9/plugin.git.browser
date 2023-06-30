@@ -86,13 +86,21 @@ def search():
 
     @dispatcher.register('repository')
     def repository():
+
         rtype = 'api'
         results = github.search(q, 'title')
-        if results is None: return
+
+        if results is None:
+            return
+
         for i in results['items']:
+
             user = i['owner']['login']
+
             response = github.find_zips(user)
-            if response is None: continue
+            if response is None:
+                continue
+
             for r in github.sort_results(response['items']):
                 url = github.get_download_url(r['repository']['full_name'], r['path'])
                 menu = kodi.context_menu()
@@ -195,13 +203,22 @@ def feed_count():
 
 @kodi.register(['install_batch', 'browse_local'], False)
 def install_batch():
+
     import xbmcgui
+
     if kodi.mode == 'install_batch':
         url = kodi.arg('url')
         xml, zip_ref = github.batch_installer(url)
     else:
-        url = kodi.dialog_browser('Select a install file', type=kodi.BROWSER_TYPES.FILE, mask='.zip')
-        if not github.re_installer.search(url): return
+
+        url = kodi.dialog_browser(
+            'Select a install file',
+            type=kodi.BROWSER_TYPES.FILE,
+            mask='.zip'
+        )
+
+        if not github.re_installer.search(url):
+            return
         xml, zip_ref = github.batch_installer(url, True)
 
     if not kodi.dialog_confirm('Batch Installer?', "Click YES to proceed.", "This will install a list of addons.", "Some configuration files and settings may be overwritten."):
@@ -285,10 +302,13 @@ def install_batch():
     # Now clean up
     zip_ref.close()
     PB.close()
+
     if len(failed_list):
         kodi.dialog_ok("Batch Error", "One or more Addons failed to install", "See log for list")
         kodi.log("Failed list: %s" % ",".join(failed_list))
+
     r = kodi.dialog_confirm(kodi.get_name(), 'Click Continue to install more addons or', 'Restart button to finalize addon installation', yes='Restart', no='Continue')
+
     if r:
         import sys
         import xbmc
@@ -329,8 +349,8 @@ def feed_list():
             title = "%s: %s" % (name, desc)
             kodi.add_menu_item({'mode': 'search', 'type': 'username', 'query': username}, {'title': title, 'plot': desc}, icon='null')
         kodi.eod()
-    except Exception as e:
-        kodi.log(e)
+    except Exception as err_str:
+        kodi.log(err_str)
 
 @kodi.register('github_install', False)
 def github_install():

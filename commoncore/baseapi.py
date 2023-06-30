@@ -71,7 +71,7 @@ class BASE_API():
             kodi.set_property('user_agent', user_agent)
             kodi.set_property('agent_refresh_time', str(int(time.time())))
         return user_agent
-    
+
     def generate_user_agent(self):
         BR_VERS = [
             ['%s.0' % i for i in range(18, 43)],
@@ -88,9 +88,9 @@ class BASE_API():
         ]
         index = random.randrange(len(RAND_UAS))
         user_agent = RAND_UAS[index].format(win_ver=random.choice(WIN_VERS), feature=random.choice(FEATURES), br_ver=random.choice(BR_VERS[index]))
-        
+
         return user_agent
-    
+
     def set_user_agent(self, headers):
         ua = self.get_user_agent()
         if headers is None:
@@ -99,7 +99,7 @@ class BASE_API():
         if self.headers is None or not self.headers:
             self.headers = {}
         self.headers.update(headers)
-    
+
     def build_url(self, uri, query, append_base):
         if append_base:
             url = self.base_url + uri
@@ -108,16 +108,16 @@ class BASE_API():
         if query is not None:
             url += '?' + urlencode(query, True)
         return url
-    
+
     def authorize(self):
         pass
-    
+
     def prepair_request(self):
         pass
-    
+
     def prepair_query(self, query):
         return query
-    
+
     def get_content(self, response):
         _type = type(response)
         if self.default_return_type == 'json':
@@ -133,7 +133,7 @@ class BASE_API():
         elif self.default_return_type == 'html_dom':
             return dom_parser.parse_html(response)
         return response
-    
+
     def get_response(self, response):    
         _type = type(response)
         if _type in [TYPES.TEXT, TYPES.UTF8]:
@@ -146,7 +146,7 @@ class BASE_API():
 
     def process_response(self, url, response, request_args, request_kwargs):
         return self.get_content(self.get_response(response))
-    
+
     def handel_error(self, error, response, request_args, request_kwargs):
         kodi.log(error)
         if response is not None:
@@ -171,18 +171,20 @@ class BASE_API():
                 else:
                     response = self.requests.get(url, headers=self.headers, timeout=timeout)
             else:
-                if encode_data: data = json.dumps(data)
+                if encode_data:
+                    data = json.dumps(data)
                 if method == 'PUT':
                     response = self.requests.put(url, data=json.dumps(data), headers=self.headers, timeout=timeout)
                 else:
                     response = self.requests.post(url, data=data, headers=self.headers, timeout=timeout)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, requests.exceptions.TooManyRedirects) as e:
-            self.handel_error(connectionException(e), None, request_args, request_kwargs)
-        if response.status_code == requests.codes.ok or response.status_code == 201:
+
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, requests.exceptions.TooManyRedirects) as err_str:
+            self.handel_error(connectionException(err_str), None, request_args, request_kwargs)
+
+        if response.status_code in ( requests.codes.ok, 201 ):
             return self.process_response(url, response, request_args, request_kwargs)
-        else:
-            return self.handel_error(responseException(response.status_code), response, request_args, request_kwargs)
-        
+        return self.handel_error(responseException(response.status_code), response, request_args, request_kwargs)
+
 class CACHABLE_API(BASE_API):
     
     def get_cached_response(self, url, cache_limit):
@@ -222,9 +224,12 @@ class CACHABLE_API(BASE_API):
             self.authorize()
         url = self.build_url(uri, query, append_base)
         cached = self.get_cached_response(url, cache_limit)
+
         if cached:
             return self.get_content(cached)
-        if type(timeout) is not int or type(timeout) is not float: timeout = float(self.timeout)
+        if type(timeout) is not int or type(timeout) is not float:
+            timeout = float(self.timeout)
+
         try:
             if data is None:
                 if method == 'DELETE':
@@ -237,14 +242,16 @@ class CACHABLE_API(BASE_API):
                     response = self.requests.put(url, data=data, headers=self.headers, timeout=timeout)
                 else:
                     response = self.requests.post(url, data=data, headers=self.headers, timeout=timeout)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, requests.exceptions.TooManyRedirects) as e:
-            self.handel_error(connectionException(e), None, request_args, request_kwargs)
-        if response.status_code == requests.codes.ok or response.status_code == 201:
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, requests.exceptions.TooManyRedirects) as err_str:
+            self.handel_error(connectionException(err_str), None, request_args, request_kwargs)
+
+        if response.status_code in ( requests.codes.ok, 201 ):
             return self.process_response( url, response, cache_limit, request_args, request_kwargs)
-        else:
-            return self.handel_error(responseException(response.status_code), response, request_args, request_kwargs)
+
+        return self.handel_error(responseException(response.status_code), response, request_args, request_kwargs)
 
 class DB_CACHABLE_API(CACHABLE_API):
+
     custom_tables = False
     DB = False
     connected = False
