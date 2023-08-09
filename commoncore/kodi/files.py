@@ -21,7 +21,7 @@ from . import vfs
 
 try:
     import cPickle as _pickle
-except:
+except Exception:
     import pickle  as _pickle
 
 pickle = _pickle.dumps

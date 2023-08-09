@@ -43,11 +43,12 @@ def download(url, addon_id, destination, unzip=False, quiet=False):
 
     if r.status_code == requests.codes.ok:
         temp_file = kodi.vfs.join(kodi.get_profile(), "downloads")
-        if not kodi.vfs.exists(temp_file): kodi.vfs.mkdir(temp_file, recursive=True)
+        if not kodi.vfs.exists(temp_file):
+            kodi.vfs.mkdir(temp_file, recursive=True)
         temp_file = kodi.vfs.join(temp_file, filename)
         try:
             total_bytes = int(r.headers["Content-Length"])
-        except:
+        except Exception:
             total_bytes = 0
         block_size = 1000
         cached_bytes = 0
@@ -57,16 +58,19 @@ def download(url, addon_id, destination, unzip=False, quiet=False):
         kodi.sleep(150)
         start = time.time()
         is_64bit = sys.maxsize > 2**32
-        if unzip and not is_64bit: zip_content = b''
+        if unzip and not is_64bit:
+            zip_content = b''
         with open(temp_file, 'wb') as f:
             for block in r.iter_content(chunk_size=block_size):
-                if not block: break
+                if not block:
+                    break
                 if not quiet and pb.iscanceled():
                     raise downloaderException('Download Aborted')
                     return False
                 cached_bytes += len(block)
                 f.write(block)
-                if unzip and not is_64bit: zip_content += block
+                if unzip and not is_64bit:
+                    zip_content += block
                 if total_bytes > 0:
                     delta = int(time.time() - start)
                     if delta:
@@ -76,7 +80,9 @@ def download(url, addon_id, destination, unzip=False, quiet=False):
                         percent = int(cached_bytes * 100 / total_bytes)
                         pb.update( percent, filename + format_status(cached_bytes, total_bytes, bs))
 
-        if not quiet: pb.close()
+        if not quiet:
+            pb.close()
+
         if unzip:
             if is_64bit:
                 zip_ref = zipfile.ZipFile(temp_file, 'r')
@@ -95,7 +101,7 @@ def download(url, addon_id, destination, unzip=False, quiet=False):
                 version = get_version_by_xml(xml)
                 if not version:
                     version = get_version_by_name(filename)
-            except:
+            except Exception:
                 kodi.log("Unable to fine version from addon.xml for addon: %s" % addon_id)
         else:
             kodi.vfs.mv(temp_file, kodi.vfs.join(destination, filename))

@@ -55,20 +55,25 @@ class responseException(BaseException):
     pass
 
 class BASE_API():
+
     default_return_type = 'text'
     base_url = ''
     user_agent = ''
     accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
     requests = requests.Session()
-    headers = {'Content-Type': 'text/html; charset=UTF-8', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'}
+    headers = {
+        'Content-Type': 'text/html; charset=UTF-8',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
+    }
     timeout = 3
+
     def get_user_agent(self):
         if self.user_agent:
             return self.user_agent
         user_agent = kodi.get_property('user_agent')
         try:
             agent_refresh_time = int(kodi.get_property('agent_refresh_time'))
-        except:
+        except Exception:
             agent_refresh_time = 0
         if not user_agent or agent_refresh_time < (time.time() - (7 * 24 * 60 * 60)):
             user_agent = self.generate_user_agent()

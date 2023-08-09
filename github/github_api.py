@@ -151,18 +151,20 @@ def split_version(name):
         match = re_split_version.search(name)
         addon_id, version = match.groups()
         return addon_id, version
-    except:
+    except Exception:
         return False, False
 
 def get_download_url(full_name, path):
     url = content_url % (full_name, default_branch, path)
-    if github.test_url(url): return url
+    if github.test_url(url):
+        return url
     # didn't work, need to get the branch name
     response = requests.get("https://api.github.com/repos/%s/branches" % full_name).json()
     for attempt in response:
         branch = attempt['name']
         url = content_url % (full_name, branch, path)
-        if github.test_url(url): return url
+        if github.test_url(url):
+            return url
     raise githubException('No available download link')
 
 def get_version_by_name(name):
@@ -176,7 +178,7 @@ def get_version_by_xml(xml):
     try:
         addon = xml.find('addon')
         version = addon['version']
-    except:
+    except Exception:
         return False
 
 def version_sort(name):
@@ -192,7 +194,8 @@ def sort_results(results, limit=False):
         final = []
         for a in results:
             addon_id, version = split_version(a['name'])
-            if addon_id == last: continue
+            if addon_id == last:
+                continue
             last = addon_id
             final.append(a)
         return final
@@ -201,13 +204,20 @@ def sort_results(results, limit=False):
         index = SORT_ORDER.OTHER
         version = get_version_by_name(name)
         version_index = LooseVersion(version)
-        if re_program.search(name): index = SORT_ORDER.PROGRAM
-        elif re_plugin.search(name): index = SORT_ORDER.PLUGIN
-        elif re_repository.search(name): index = SORT_ORDER.REPO
-        elif re_service.search(name): index = SORT_ORDER.SERVICE
-        elif re_script.search(name): index = SORT_ORDER.SCRIPT
-        elif re_feed.search(name): index = SORT_ORDER.FEED
-        elif re_installer.search(name): index = SORT_ORDER.INSTALLER
+        if re_program.search(name):
+            index = SORT_ORDER.PROGRAM
+        elif re_plugin.search(name):
+            index = SORT_ORDER.PLUGIN
+        elif re_repository.search(name):
+            index = SORT_ORDER.REPO
+        elif re_service.search(name):
+            index = SORT_ORDER.SERVICE
+        elif re_script.search(name):
+            index = SORT_ORDER.SCRIPT
+        elif re_feed.search(name):
+            index = SORT_ORDER.FEED
+        elif re_installer.search(name):
+            index = SORT_ORDER.INSTALLER
         return index, name.lower(), version_index
     if limit:
         return highest_versions(sorted(results, key=lambda x:sort_results(x['name']), reverse=True))
@@ -220,7 +230,8 @@ def limit_versions(results):
     final = []
     sorted_results = sort_results(results['items'], True)
     for a in sorted_results:
-        if not is_zip(a['name']): continue
+        if not is_zip(a['name']):
+            continue
         a['is_feed'] = True if re_feed.search(a['name']) else False
         a['is_installer'] = True if re_installer.search(a['name']) else False
         a['is_repository'] = True if re_repository.search(a['name']) else False
@@ -237,7 +248,8 @@ def search(q, method=False):
         results = []
         temp = GH.request("/search/code", query={"per_page": page_limit, "q": "in:path %s.zip" % q, "access_token": get_token()}, cache_limit=EXPIRE_TIMES.HOUR)
         for t in temp['items']:
-            if re_version.search(t['name']): results.append(t)
+            if re_version.search(t['name']):
+                results.append(t)
         return results
     else:
         return GH.request("/search/repositories", query={"per_page": page_limit, "q": q}, cache_limit=EXPIRE_TIMES.HOUR)
@@ -261,7 +273,8 @@ def find_zips(user, repo=None):
 def find_zip(user, addon_id):
     results = []
     response = GH.request("/search/code", query={"q": "user:%s filename:%s*.zip" % (user, addon_id)}, cache_limit=EXPIRE_TIMES.HOUR)
-    if response is None: return False, False, False
+    if response is None:
+        return False, False, False
     if response['total_count'] > 0:
         test = re.compile("%s(-.+\.zip|\.zip)$" % addon_id, re.IGNORECASE)
         def sort_results(name):

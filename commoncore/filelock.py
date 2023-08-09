@@ -106,15 +106,14 @@ class Timeout(TimeoutError):
 # Classes
 # ------------------------------------------------
 class BaseFileLock(object):
-    """
-    Implements the base class of a file lock.
-    """
+    """ Implements the base class of a file lock. """
 
     def __init__(self, lock_file, timeout = -1):
-        """
-        """
+        """ init """
+
         # The path to the lock file.
-        if lock_file.endswith(".lock") is False: lock_file += ".lock"
+        if lock_file.endswith(".lock") is False:
+            lock_file += ".lock"
         self._lock_file = lock_file
 
         # The file descriptor for the *_lock_file* as it is returned by the

@@ -26,16 +26,14 @@ __set_setting = __addon.setSetting
 def get_setting(k, addon_id=None):
     if addon_id is None:
         return __get_setting(k)
-    else:
-        return xbmcaddon.Addon(addon_id).getSetting(k)
+    return xbmcaddon.Addon(addon_id).getSetting(k)
 
 def set_setting(k, v, addon_id=None):
     if not isinstance(v, str):
         v = str(v)
     if addon_id is None:
         return __set_setting(k, v)
-    else:
-        return xbmcaddon.Addon(addon_id).setSetting(k, v)
+    return xbmcaddon.Addon(addon_id).setSetting(k, v)
 
 try:
     HANDLE_ID = int(sys.argv[1])

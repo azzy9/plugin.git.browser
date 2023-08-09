@@ -35,7 +35,8 @@ SOURCES = kodi.enum(DEFAULT=0, REPO=1, ZIP=2)
 
 def update_addons(quiet=True):
     from distutils.version import LooseVersion
-    if not quiet: kodi.open_busy_dialog()
+    if not quiet:
+        kodi.open_busy_dialog()
     sources = DB.query("SELECT addon_id, source FROM install_history")
     update_count = 0
     for source in sources:
@@ -81,7 +82,8 @@ class GitHub_Installer():
         self.installed_list = installed_list
         self.quiet = quiet
         self.batch=batch
-        if not self.quiet: kodi.open_busy_dialog()
+        if not self.quiet:
+            kodi.open_busy_dialog()
         v = kodi.get_kodi_version()
 
         # Grab a list of KNOWN addons from the database. Unfortunately Jarvis requires direct database access for the installed flag
@@ -127,7 +129,8 @@ class GitHub_Installer():
                 kodi.sleep(100)
             self.enable_addon(addon_id)
 
-        if not quiet: pb.next("Looking for Updates", "")
+        if not quiet:
+            pb.next("Looking for Updates", "")
         kodi.sleep(500)
         kodi.run_command('XBMC.UpdateAddonRepos')
 
@@ -166,8 +169,9 @@ class GitHub_Installer():
                         continue
                     elif kodi.get_setting('prompt_optional') == "true":
                         c = kodi.dialog_confirm("Install Optional Dependency", dep['name'], dep['addon'])
-                        if not c: continue
-            except:
+                        if not c:
+                            continue
+            except Exception:
                 pass
             if test in ['xbmc.python', 'xbmc.gui'] or kodi.get_condition_visiblity('System.HasAddon(%s)' % test) == 1 or test in self.installed_list:
                 kodi.log('Dependency is already installed: %s' % test)
@@ -211,11 +215,13 @@ class GitHub_Installer():
 
             # check if this exists in users root repo
             if kodi.get_setting('source_user') == 'true':
-                if user_resolver(user, unmet): continue
+                if user_resolver(user, unmet):
+                    continue
 
             # check if this exists on github
             if kodi.get_setting('source_github') == 'true':
-                if github_resolver(unmet): continue
+                if github_resolver(unmet):
+                    continue
 
         self.unmet_addons = list(set(self.unmet_addons) - set(self.met_addons))
         if len(self.unmet_addons):
@@ -257,7 +263,9 @@ class GitHub_Installer():
 
     def enable_addon(self, addon_id):
         try:
-            if addon_id in ['xbmc.python', 'xbmc.gui'] or kodi.get_condition_visiblity('System.HasAddon(%s)' % addon_id) == 1: return True
+            if addon_id in ['xbmc.python', 'xbmc.gui'] or kodi.get_condition_visiblity('System.HasAddon(%s)' % addon_id) == 1:
+                return True
             kodi.log("Enable Addon: %s" % addon_id)
             kodi.kodi_json_request("Addons.SetAddonEnabled", {"addonid": addon_id, "enabled": True})
-        except: pass
+        except Exception:
+            pass

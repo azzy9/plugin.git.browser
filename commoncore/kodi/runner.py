@@ -47,7 +47,7 @@ except Exception:
     args = {"mode": mode}
 
 def arg(k, default=None, decode=None):
-    return_val = default
+
     if k in args:
         v = args[k]
 

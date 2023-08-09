@@ -99,13 +99,13 @@ def parse_dom(html, name=u"", attrs={}, ret=False):
     if isinstance(name, str):  # Should be handled
         try:
             name = name   # .decode("utf-8")
-        except:
+        except Exception:
             pass
 
     if isinstance(html, str):
         try:
             html = [html.decode("utf-8")]  # Replace with chardet thingy
-        except:
+        except Exception:
             html = [html]
     elif isinstance(html, unicode):
         html = [html]
@@ -192,13 +192,13 @@ class DomObject(object):
         if isinstance(name, str):  # Should be handled
             try:
                 name = name   # .decode("utf-8")
-            except:
+            except Exception:
                 pass
 
         if isinstance(html, str):
             try:
                 html = [html.decode("utf-8")]  # Replace with chardet thingy
-            except:
+            except Exception:
                 html = [html]
         elif isinstance(html, unicode):
             html = [html]
