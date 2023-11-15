@@ -69,18 +69,19 @@ class GitHubAPI(CACHABLE_API):
     default_return_type = 'json'
     base_url = "https://api.github.com"
 
+    def __init__(self):
+        super(GitHubAPI, self).__init__()
+        self.access_token = kodi.get_setting('access_token')
+        if self.access_token:
+            self.default_headers = {'Authorization': 'token {}'.format(self.access_token)} if self.access_token else {}
+
     def prepair_request(self):
         kodi.sleep(random.randint(100, 250)) # random delay 50-250 ms
 
     def build_url(self, uri, query, append_base):
         if append_base:
             url = self.base_url + uri
-        token = kodi.get_setting('access_token')
-        if token:
-            if query is None:
-                query = {"access_token": token}
-            else:
-                query["access_token"] = token
+
         if query is not None:
             query = urlencode(query)
             for r in [('%3A', ":"), ("%2B", "+")]:
