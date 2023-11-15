@@ -228,6 +228,14 @@ class CACHABLE_API(BASE_API):
     def request(self, uri, query=None, data=None, append_base=True, headers=None, auth=None, method=None, timeout=None, encode_data=True, cache_limit=0):
         query = self.prepair_query(query)
         request_args = (uri,)
+
+        if headers is None:
+            # Use default headers
+            headers = self.default_headers
+        else:
+            # Merge the default headers with the provided headers
+            headers = {**self.default_headers, **headers}
+
         request_kwargs = {"query": query, "data": data, "append_base": append_base, "headers": headers, "auth": auth, "method": method, "timeout": timeout, "cache_limit": cache_limit, "encode_data": encode_data}
         self.set_user_agent(headers)
         if auth is not None:
