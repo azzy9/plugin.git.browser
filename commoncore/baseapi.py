@@ -264,7 +264,7 @@ class CACHABLE_API(BASE_API):
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, requests.exceptions.TooManyRedirects) as err_str:
             self.handel_error(connectionException(err_str), None, request_args, request_kwargs)
 
-        if response.status_code in ( requests.codes.ok, 201 ):
+        if response.status_code in ( requests.codes.ok, 201 ) or (response.status_code == 404 and response.json().get('message') is not None):
             return self.process_response( url, response, cache_limit, request_args, request_kwargs)
 
         return self.handel_error(responseException(response.status_code), response, request_args, request_kwargs)

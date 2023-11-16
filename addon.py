@@ -94,26 +94,17 @@ def search():
             return
 
         for i in results['items']:
-
             user = i['owner']['login']
 
-            response = github.find_zips(user)
-            if response is None:
+            response = github.find_latest_release_zips(user, i['name'])
+
+            if response is None or response.get('message') is not None:
                 continue
 
-            for r in github.sort_results(response['items']):
-                url = github.get_download_url(r['repository']['full_name'], r['path'])
+            for r in github.sort_results(response['assets']):
+                url = r['browser_download_url']
                 menu = kodi.context_menu()
-                if r['is_repository']:
-                    menu.add('Browse Repository Contents', {"mode": "browse_repository", "url": url, "file": r['name'], "full_name": "%s/%s" % (q, r['repository']['name'])})
-                if r['is_feed']:
-                    r['display'] = "[COLOR yellow]%s[/COLOR]" % r['name']
-                    kodi.add_menu_item({'mode': 'install_feed', "url": url}, {'title': r['name']}, menu=menu, icon='null')
-                elif r['is_installer']:
-                    r['display'] = "[COLOR orange]%s[/COLOR]" % r['name']
-                    kodi.add_menu_item({'mode': 'install_batch', "url": url}, {'title': r['name'], 'display': r['display']}, menu=menu, icon='null')
-                else:
-                    kodi.add_menu_item({'mode': 'github_install', "url": url, "user": q, "file": r['name'], "full_name": "%s/%s" % (q, r['repository']['name'])}, {'title': r['name']}, menu=menu, icon='null')
+                kodi.add_menu_item({'mode': 'github_install', "url": url, "user": user, "file": r['name'], "full_name": "%s/%s" % (user, i['name'])}, {'title': f"{user}/{i['name']}/{r['name']}"}, menu=menu, icon='null')
 
     @dispatcher.register('addonid')
     def addonid():
@@ -363,7 +354,7 @@ def github_install():
 
     r = kodi.dialog_confirm(
         kodi.get_name(),
-        'Click Continue to install more addons or',
+        'Click Continue to install more addons or ',
         'Restart button to finalize addon installation',
         yes='Restart',
         no='Continue'
