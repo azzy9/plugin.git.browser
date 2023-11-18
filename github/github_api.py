@@ -40,25 +40,6 @@ base_url = "https://api.github.com"
 content_url = "https://raw.githubusercontent.com/%s/%s/%s"
 page_limit = 100
 
-def get_token():
-    dts= "" \
-    "NzUxOTg0NjE5YWY3MTEzNmY2ZDM2ZGM4NzFkNzcxY2FjYzZlZG" \
-    "ExNiBlNDQ5Zjc0MjM4ZTY1Mjc1ODIwYjk0Zjc1ZTAxOTE1Njhh" \
-    "NDI3M2Q2IDdiMjFkMTJkMzgzOGFiODYzYzlhMzNhNzZkN2MxZj" \
-    "k0N2M3NDFjMTcgNDhjMjlkN2FjMzUwMWRlM2JhYzU2ODk4NmI2" \
-    "NjJkZWM1MDYyZDA5YyA0NTY3NWVkMzBhMmNkNmQ5MTM4YzQwOT" \
-    "g3NGVhNzRlY2RjYWQ5ZDUzIDBmMmE1MzI0NWM5N2VmNjQ0MmFl" \
-    "NzA0ZjQwYTMzYzUxODdkNzhiNzkgMDNlMDUwOGQxYzE0YjQwZG" \
-    "ZmZmIwNDcwM2FlM2I3MzllNDZmMTQxNCAzM2RmZTk1OWRiNTYy" \
-    "OWIzMTlkY2U3NzhmYjQwNjkwM2FkYTA4ZjMyIDg1ZDBmMDhhND" \
-    "U5ZGM3YmQyNzg1YWJmMTU4M2NkNGVkYzBhM2YxNjMgM2U0NDY2" \
-    "ZTkwYTZhM2Y0NmU1OWU5ZjI4ZDAzNjE5ZmNiMWE4YTMyMiA4OT" \
-    "M4NWYyODg2OTA3NzA1ZWZmZGM4MjY1NmYxNmFhOTI4NDAzNjc1" \
-    "IDJiMmIzN2VkNmU5YjQ3MGNmMGVlMjljNzI2YzFjZjRhZGFiYT" \
-    "FlMmM="
-
-    return random.choice(base64.b64decode(dts).split())
-
 SORT_ORDER = kodi.enum(REPO=0, FEED=1, INSTALLER=2, PLUGIN=3, PROGRAM=4, SKIN=5, SERVICE=6, SCRIPT=7, OTHER=100)
 
 #class GitHubWeb(CACHABLE_API):
@@ -66,6 +47,7 @@ SORT_ORDER = kodi.enum(REPO=0, FEED=1, INSTALLER=2, PLUGIN=3, PROGRAM=4, SKIN=5,
 #    base_url = "https://github.com/search"
 
 class GitHubAPI(CACHABLE_API):
+
     default_return_type = 'json'
     base_url = "https://api.github.com"
 
@@ -91,6 +73,7 @@ class GitHubAPI(CACHABLE_API):
         return url
 
     def handle_error(self, error, response, request_args, request_kwargs):
+    
         if response.status_code == 401:
             traceback.print_stack()
             kodi.close_busy_dialog()
@@ -147,6 +130,7 @@ re_version = re.compile("-([^zip]+)\.zip$", re.IGNORECASE)
 re_split_version = re.compile("^(.+?)-([^zip]+)\.zip$")
 
 def is_zip(filename):
+
     return filename.lower().endswith('.zip')
 
 def split_version(name):
@@ -158,9 +142,11 @@ def split_version(name):
         return False, False
 
 def get_download_url(full_name, path):
+
     url = content_url % (full_name, default_branch, path)
     if github.test_url(url):
         return url
+
     # didn't work, need to get the branch name
     response = requests.get("https://api.github.com/repos/%s/branches" % full_name).json()
     for attempt in response:
@@ -171,13 +157,15 @@ def get_download_url(full_name, path):
     raise githubException('No available download link')
 
 def get_version_by_name(name):
+
     version = re_version.search(name)
     if version:
         return version.group(1)
-    else:
-        return '0.0.0'
+
+    return '0.0.0'
 
 def get_version_by_xml(xml):
+
     try:
         addon = xml.find('addon')
         version = addon['version']
@@ -185,13 +173,15 @@ def get_version_by_xml(xml):
         return False
 
 def version_sort(name):
+
     v = re_version.search(name)
     if v:
         return LooseVersion(v.group(1))
-    else:
-        return LooseVersion('0.0.0')
+
+    return LooseVersion('0.0.0')
 
 def sort_results(results, limit=False):
+
     def highest_versions(results):
         last = ""
         final = []
@@ -249,7 +239,7 @@ def search(q, method=False):
         return GH.request("/search/repositories", query={"per_page": page_limit, "q": "in:name %s" % q}, cache_limit=EXPIRE_TIMES.HOUR)
     elif method == 'id':
         results = []
-        temp = GH.request("/search/code", query={"per_page": page_limit, "q": "in:path %s.zip" % q, "access_token": get_token()}, cache_limit=EXPIRE_TIMES.HOUR)
+        temp = GH.request("/search/code", query={"per_page": page_limit, "q": "in:path %s.zip" % q}, cache_limit=EXPIRE_TIMES.HOUR)
         for t in temp['items']:
             if re_version.search(t['name']):
                 results.append(t)
