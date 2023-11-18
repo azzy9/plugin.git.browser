@@ -117,17 +117,19 @@ class GitHubAPI(CACHABLE_API):
         else:
             page = 1
         results = response.json()
-        total_count = float(results['total_count'])
-        page_count = int(math.ceil(total_count / page_limit))
-        if page_count > 1 and page == 1:
-            results = response.json()
-            for p in range(page+1, int(page_count+1)):
-                kodi.sleep(500)
-                request_kwargs['query']['page'] = p
-                temp = self.request(*request_args, **request_kwargs)
-                results['items'] += temp['items']
-            self.cache_response(url, json.dumps(results), cache_limit)
-            return results
+
+        if results.get('total_count') is not None:
+            total_count = float(results['total_count'])
+            page_count = int(math.ceil(total_count / page_limit))
+            if page_count > 1 and page == 1:
+                results = response.json()
+                for p in range(page+1, int(page_count+1)):
+                    kodi.sleep(500)
+                    request_kwargs['query']['page'] = p
+                    temp = self.request(*request_args, **request_kwargs)
+                    results['items'] += temp['items']
+                self.cache_response(url, json.dumps(results), cache_limit)
+                return results
         self.cache_response(url, response.text, cache_limit)
         return self.get_content(self.get_response(response))
 
@@ -257,6 +259,10 @@ def search(q, method=False):
 
 #def find_xml(full_name):
 #    return GitHubWeb().request(content_url % (full_name, default_branch, 'addon.xml'), append_base=False)
+
+def find_latest_release_zips(user, repo):
+    results = GH.request(f"/repos/{user}/{repo}/releases/latest", query={})
+    return results
 
 def find_zips(user, repo=None):
     filters = {'Repository': '*repository*.zip', 'Feed': '*gitbrowser.feed*.zip', 'Installer': '*gitbrowser.installer*.zip', 'Music Plugin': '*plugin.audio*.zip', 'Video Plugin': '*plugin.video*.zip', 'Script': '*script*.zip'}
