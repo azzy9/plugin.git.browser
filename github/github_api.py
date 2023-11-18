@@ -250,6 +250,7 @@ def search(q, method=False):
 
     return GH.request("/search/repositories", query={"per_page": page_limit, "q": q}, cache_limit=EXPIRE_TIMES.HOUR)
 
+# TODO: used in github/github_installer.py, find out use
 #def find_xml(full_name):
 #    return GitHubWeb().request(content_url % (full_name, default_branch, 'addon.xml'), append_base=False)
 
