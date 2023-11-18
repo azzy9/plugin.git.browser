@@ -90,7 +90,7 @@ class GitHubAPI(CACHABLE_API):
             url += '?' + query
         return url
 
-    def handel_error(self, error, response, request_args, request_kwargs):
+    def handle_error(self, error, response, request_args, request_kwargs):
         if response.status_code == 401:
             traceback.print_stack()
             kodi.close_busy_dialog()
@@ -103,7 +103,7 @@ class GitHubAPI(CACHABLE_API):
                 kodi.sleep(1000)
             return self.request(*request_args, **request_kwargs)
         elif response.status_code == 422 and 'Only the first 1000' in response.text:
-            kodi.handel_error('Result count exceeds API limit.', 'Try different search or result filter.')
+            kodi.handle_error('Result count exceeds API limit.', 'Try different search or result filter.')
             kodi.close_busy_dialog()
             traceback.print_stack()
         else:

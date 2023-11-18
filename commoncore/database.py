@@ -71,7 +71,7 @@ class BASEDatabase:
             if test.search(err):
                 return True
 
-    def handel_error(self, error):
+    def handle_error(self, error):
         traceback.print_stack()
         raise error
 
@@ -93,7 +93,7 @@ class BASEDatabase:
             return rows
         except Exception as err_str:
             if self.quiet is False or quiet is False and not self.ignore_errors(err_str):
-                self.handel_error(DatabaseException("Database Error: %s" % err_str))
+                self.handle_error(DatabaseException("Database Error: %s" % err_str))
                 kodi.log("Database Error: %s" % err_str)
 
     def query_assoc(self, SQL, data=None, force_double_array=True, quiet=False):
@@ -114,7 +114,7 @@ class BASEDatabase:
 
         except Exception as err_str:
             if self.quiet is False or quiet is False and not self.ignore_errors(err_str):
-                self.handel_error(DatabaseException("Database Error: %s" % err_str))
+                self.handle_error(DatabaseException("Database Error: %s" % err_str))
                 kodi.log("Database Error: %s" % err_str)
 
     def execute(self, SQL, data=[], quiet=False):
@@ -131,7 +131,7 @@ class BASEDatabase:
                 self.lastrowid = None
         except Exception as err_str:
             if self.quiet is False or quiet is False and not self.ignore_errors(err_str):
-                self.handel_error(DatabaseException("SQLite Database Error: %s" % err_str))
+                self.handle_error(DatabaseException("SQLite Database Error: %s" % err_str))
                 kodi.log("Database Error: %s" % err_str)
 
     def execute_many(self, SQL, data, quiet=False):
@@ -140,7 +140,7 @@ class BASEDatabase:
             self.DBC.executemany(SQL, data)
         except Exception as err_str:
             if self.quiet is False or quiet is False and not self.ignore_errors(err_str):
-                self.handel_error(DatabaseException("Database Error: %s" % err_str))
+                self.handle_error(DatabaseException("Database Error: %s" % err_str))
                 kodi.log("Database Error: %s" % err_str)
 
     def run_script(self, sql_file, commit=True):
@@ -192,7 +192,7 @@ class SQLiteDatabase(BASEDatabase):
                     return rows
             except Exception as err_str:
                 if self.quiet is False or quiet is False and not self.ignore_errors(err_str):
-                    self.handel_error(DatabaseException("SQLite Database Error: %s" % err_str))
+                    self.handle_error(DatabaseException("SQLite Database Error: %s" % err_str))
                     kodi.log("SQLite Database Error: %s" % err_str)
             finally:
                 self.db_lock.release()
@@ -223,7 +223,7 @@ class SQLiteDatabase(BASEDatabase):
                     return rows
             except Exception as err_str:
                 if self.quiet is False or quiet is False and not self.ignore_errors(err_str):
-                    self.handel_error(DatabaseException("SQLite Database Error: %s" % err_str))
+                    self.handle_error(DatabaseException("SQLite Database Error: %s" % err_str))
                     kodi.log("SQLite Database Error: %s" % err_str)
             finally:
                 del DBH
@@ -243,7 +243,7 @@ class SQLiteDatabase(BASEDatabase):
                     self.lastrowid = None
             except Exception as err_str:
                 if self.quiet is False or quiet is False and not self.ignore_errors(err_str):
-                    self.handel_error(DatabaseException("SQLite Database Error: %s" % err_str))
+                    self.handle_error(DatabaseException("SQLite Database Error: %s" % err_str))
                     kodi.log("SQLite Database Error: %s" % err_str)
             finally:
                 self.db_lock.release()
@@ -255,7 +255,7 @@ class SQLiteDatabase(BASEDatabase):
                 self.DBC.executemany(SQL, data)
             except Exception as err_str:
                 if self.quiet is False or quiet is False and not self.ignore_errors(err_str):
-                    self.handel_error(DatabaseException("SQLite Database Error: %s" % err_str))
+                    self.handle_error(DatabaseException("SQLite Database Error: %s" % err_str))
                     kodi.log("SQLite Database Error: %s" % err_str)
             finally:
                 self.db_lock.release()
@@ -281,7 +281,7 @@ class SQLiteDatabase(BASEDatabase):
             self.DBC = self.DBH.cursor()
             self.__connected = True
         except Exception as err_str:
-            self.handel_error(DatabaseException("SQLite Database Error: %s" % err_str))
+            self.handle_error(DatabaseException("SQLite Database Error: %s" % err_str))
             kodi.log("SQLite Database Error: %s" % err_str)
 
 class MySQLDatabase(BASEDatabase):
@@ -319,7 +319,7 @@ class MySQLDatabase(BASEDatabase):
             self.DBC = self.DBH.cursor()
             self.__connected = True
         except Exception as err_str:
-            self.handel_error(DatabaseException("MySQL Database Error: %s" % err_str))
+            self.handle_error(DatabaseException("MySQL Database Error: %s" % err_str))
 
     def prepaire_sql(self, SQL):
         SQL = SQL.replace('?', '%s')
@@ -338,7 +338,7 @@ class MySQLDatabase(BASEDatabase):
                 self.lastrowid = None
         except Exception as err_str:
             if self.quiet is False or quiet is False and not self.ignore_errors(err_str):
-                self.handel_error(DatabaseException("MySQL Database Error: %s" % err_str))
+                self.handle_error(DatabaseException("MySQL Database Error: %s" % err_str))
 
     def execute_many(self, SQL, data, quiet=False):
         try:
@@ -346,7 +346,7 @@ class MySQLDatabase(BASEDatabase):
             self.DBC.executemany(SQL, data)
         except Exception as err_str:
             if self.quiet is False or quiet is False and not self.ignore_errors(err_str):
-                self.handel_error(DatabaseException("MySQL Database Error: %s" % err_str))
+                self.handle_error(DatabaseException("MySQL Database Error: %s" % err_str))
 
     def query(self, SQL, data=None, force_double_array=True, quiet=False):
         try:
@@ -362,7 +362,7 @@ class MySQLDatabase(BASEDatabase):
                 return rows
         except Exception as err_str:
             if self.quiet is False or quiet is False and not self.ignore_errors(err_str):
-                self.handel_error(DatabaseException("MySQL Database Error: %s" % err_str))
+                self.handle_error(DatabaseException("MySQL Database Error: %s" % err_str))
 
     def query_assoc(self, SQL, data=None, force_double_array=True, quiet=False):
         try:
@@ -387,4 +387,4 @@ class MySQLDatabase(BASEDatabase):
                 return set
         except Exception as err_str:
             if self.quiet is False or quiet is False and not self.ignore_errors(err_str):
-                self.handel_error(DatabaseException("MySQL Database Error: %s" % err_str))
+                self.handle_error(DatabaseException("MySQL Database Error: %s" % err_str))

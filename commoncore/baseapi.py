@@ -156,7 +156,8 @@ class BASE_API():
     def process_response(self, url, response, request_args, request_kwargs):
         return self.get_content(self.get_response(response))
 
-    def handel_error(self, error, response, request_args, request_kwargs):
+    def handle_error(self, error, response, request_args, request_kwargs):
+
         kodi.log(error)
         if response is not None:
             kodi.log(response.url)
@@ -189,11 +190,11 @@ class BASE_API():
                     response = self.requests.post(url, data=data, headers=self.headers, timeout=timeout)
 
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, requests.exceptions.TooManyRedirects) as err_str:
-            self.handel_error(connectionException(err_str), None, request_args, request_kwargs)
+            self.handle_error(connectionException(err_str), None, request_args, request_kwargs)
 
         if response.status_code in ( requests.codes.ok, 201 ):
             return self.process_response(url, response, request_args, request_kwargs)
-        return self.handel_error(responseException(response.status_code), response, request_args, request_kwargs)
+        return self.handle_error(responseException(response.status_code), response, request_args, request_kwargs)
 
 class CACHABLE_API(BASE_API):
 
@@ -262,12 +263,12 @@ class CACHABLE_API(BASE_API):
                 else:
                     response = self.requests.post(url, data=data, headers=self.headers, timeout=timeout)
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, requests.exceptions.TooManyRedirects) as err_str:
-            self.handel_error(connectionException(err_str), None, request_args, request_kwargs)
+            self.handle_error(connectionException(err_str), None, request_args, request_kwargs)
 
         if response.status_code in ( requests.codes.ok, 201 ) or (response.status_code == 404 and response.json().get('message') is not None):
             return self.process_response( url, response, cache_limit, request_args, request_kwargs)
 
-        return self.handel_error(responseException(response.status_code), response, request_args, request_kwargs)
+        return self.handle_error(responseException(response.status_code), response, request_args, request_kwargs)
 
 class DB_CACHABLE_API(CACHABLE_API):
 

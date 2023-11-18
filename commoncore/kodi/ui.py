@@ -37,7 +37,7 @@ def notify(heading, message, timeout=1500, image=vfs.join(get_path(), 'icon.png'
     cmd = "Notification(%s, %s, %s, %s)" % (heading, message, timeout, image)
     xbmc.executebuiltin(cmd)
 
-def handel_error(heading, message, timeout=3000):
+def handle_error(heading, message, timeout=3000):
     image=vfs.join(ARTWORK, 'error.png')
     cmd = "Notification(%s, %s, %s, %s)" % (heading, message, timeout, image)
     xbmc.executebuiltin(cmd)

@@ -18,7 +18,7 @@ import traceback
 import sys
 import json
 from .addon import get_setting, set_property, open_settings, get_name, get_id, eod
-from .ui import handel_error
+from .ui import handle_error
 from .logger import log
 try:
     from urllib.parse import parse_qs
@@ -113,7 +113,7 @@ def execute_api(namespace, api):
     except Exception as e:
         import traceback
         traceback.print_exc()
-        handel_error("API Error", "Invalid API or Method")
+        handle_error("API Error", "Invalid API or Method")
         raise e("Invalid API or Method")
 
 def run():
@@ -135,4 +135,4 @@ def run():
     #except Exception as e:
     #    log(e)
     #    traceback.print_stack()
-    #    handel_error("%s Error" % get_name(), 'Invalid Mode')
+    #    handle_error("%s Error" % get_name(), 'Invalid Mode')
