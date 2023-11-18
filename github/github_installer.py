@@ -113,14 +113,15 @@ class GitHub_Installer():
         # Initiate install routine
         self.install_addon(addon_id, url, full_name, master)
 
-
         completed = list(reversed(self.completed))
         if not quiet:
             pb = kodi.ProgressBar()
             pb.new('Enabling Addons', len(completed)+1)
             pb.update_subheading('Building Addon List')
-        kodi.run_command("XBMC.UpdateLocalAddons()")
+
+        kodi.run_command("UpdateLocalAddons")
         kodi.sleep(500)
+
         for addon_id in completed:
             if not quiet:
                 #percent = 100* (completed.index(addon_id) / len(completed))
@@ -132,7 +133,7 @@ class GitHub_Installer():
         if not quiet:
             pb.next("Looking for Updates", "")
         kodi.sleep(500)
-        kodi.run_command('XBMC.UpdateAddonRepos')
+        kodi.run_command('UpdateAddonRepos')
 
         # Enable installed addons
         if not self.quiet:
@@ -263,7 +264,7 @@ class GitHub_Installer():
 
     def enable_addon(self, addon_id):
         try:
-            if addon_id in ['xbmc.python', 'xbmc.gui'] or kodi.get_condition_visiblity(f'System.HasAddon({addon_id})') == 1:
+            if addon_id in ['xbmc.python', 'xbmc.gui'] or kodi.get_condition_visiblity(f'System.HasAddon({addon_id})') == 0:
                 return True
             kodi.log("Enable Addon: %s" % addon_id)
             kodi.kodi_json_request("Addons.SetAddonEnabled", {"addonid": addon_id, "enabled": True})

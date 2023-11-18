@@ -147,15 +147,15 @@ def refresh(plugin_url=None):
         run_command("Container.Refresh(%s)" % plugin_url)
 
 def execute_url(plugin_url):
-    cmd = 'XBMC.RunPlugin(%s)' % (plugin_url)
+    cmd = 'RunPlugin(%s)' % (plugin_url)
     run_command(cmd)
 
 def execute_script(script):
-    cmd = 'XBMC.RunScript(%s)' % (script)
+    cmd = 'RunScript(%s)' % (script)
     run_command(cmd)
 
 def execute_addon(addon_id):
-    cmd = 'XBMC.RunAddon(%s)' % addon_id
+    cmd = 'RunAddon(%s)' % addon_id
     run_command(cmd)
 
 def navigate_to(query):
@@ -163,14 +163,14 @@ def navigate_to(query):
     go_to_url(plugin_url)
 
 def go_to_url(plugin_url):
-    cmd = "XBMC.Container.Update(%s)" % plugin_url
+    cmd = 'Container.Update(%s)' % plugin_url
     run_command(cmd)
 
 def play_url(plugin_url, isFolder=False):
     if isFolder:
-        cmd = 'XBMC.PlayMedia(%s,True)' % (plugin_url)
+        cmd = 'PlayMedia(%s,True)' % (plugin_url)
     else:
-        cmd = 'XBMC.PlayMedia(%s)' % (plugin_url)
+        cmd = 'PlayMedia(%s)' % (plugin_url)
     run_command(cmd)
 
 play_media = play_url
@@ -248,9 +248,9 @@ class ContextMenu:
             plugin_url =  "%s?%s" % (sys.argv[0],  urlencode(arguments))
 
         if script:
-            cmd = 'XBMC.RunPlugin(%s)' % (plugin_url)
+            cmd = 'RunPlugin(%s)' % (plugin_url)
         else:
-            cmd = "XBMC.Container.Update(%s)" % plugin_url
+            cmd = 'Container.Update(%s)' % plugin_url
         return cmd
 
     def get(self):

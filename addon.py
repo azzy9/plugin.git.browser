@@ -352,23 +352,6 @@ def github_install():
     addon_id = re.sub("-[\d\.]+zip$", "", kodi.arg('file'))
     github_installer.GitHub_Installer(addon_id, kodi.arg('url'), kodi.arg('full_name'), kodi.vfs.join("special://home", "addons"))
 
-    r = kodi.dialog_confirm(
-        kodi.get_name(),
-        'Click Continue to install more addons or ',
-        'Restart button to finalize addon installation',
-        yes='Restart',
-        no='Continue'
-    )
-
-    if r:
-        import sys
-        import xbmc
-        if sys.platform in ['linux', 'linux2', 'win32']:
-            xbmc.executebuiltin('RestartApp')
-        else:
-            xbmc.executebuiltin('ShutDown')
-
-
 @kodi.register('browse_repository', False)
 def browse_repository():
     xml = github.browse_repository(kodi.arg('url'))

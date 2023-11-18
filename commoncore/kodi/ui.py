@@ -34,12 +34,12 @@ def close_busy_dialog():
     xbmc.executebuiltin( "Dialog.Close(busydialog)" )
 
 def notify(heading, message, timeout=1500, image=vfs.join(get_path(), 'icon.png')):
-    cmd = "XBMC.Notification(%s, %s, %s, %s)" % (heading, message, timeout, image)
+    cmd = "Notification(%s, %s, %s, %s)" % (heading, message, timeout, image)
     xbmc.executebuiltin(cmd)
 
 def handel_error(heading, message, timeout=3000):
     image=vfs.join(ARTWORK, 'error.png')
-    cmd = "XBMC.Notification(%s, %s, %s, %s)" % (heading, message, timeout, image)
+    cmd = "Notification(%s, %s, %s, %s)" % (heading, message, timeout, image)
     xbmc.executebuiltin(cmd)
     sys.exit()
 
@@ -161,9 +161,9 @@ class ContextMenu:
             plugin_url =  "%s?%s" % (sys.argv[0],  urlencode(arguments))
 
         if script:
-            cmd = 'XBMC.RunPlugin(%s)' % (plugin_url)
+            cmd = 'RunPlugin(%s)' % (plugin_url)
         else:
-            cmd = "XBMC.Container.Update(%s)" % plugin_url
+            cmd = 'Container.Update(%s)' % plugin_url
         return cmd
 
     def get(self):
