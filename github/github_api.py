@@ -233,19 +233,22 @@ def limit_versions(results):
     return results
 
 def search(q, method=False):
+
     if method=='user':
         return GH.request("/search/repositories", query={"per_page": page_limit, "q": "user:%s" % q}, cache_limit=EXPIRE_TIMES.HOUR)
-    elif method=='title':
+
+    if method=='title':
         return GH.request("/search/repositories", query={"per_page": page_limit, "q": "in:name %s" % q}, cache_limit=EXPIRE_TIMES.HOUR)
-    elif method == 'id':
+
+    if method == 'id':
         results = []
         temp = GH.request("/search/code", query={"per_page": page_limit, "q": "in:path %s.zip" % q}, cache_limit=EXPIRE_TIMES.HOUR)
         for t in temp['items']:
             if re_version.search(t['name']):
                 results.append(t)
         return results
-    else:
-        return GH.request("/search/repositories", query={"per_page": page_limit, "q": q}, cache_limit=EXPIRE_TIMES.HOUR)
+
+    return GH.request("/search/repositories", query={"per_page": page_limit, "q": q}, cache_limit=EXPIRE_TIMES.HOUR)
 
 #def find_xml(full_name):
 #    return GitHubWeb().request(content_url % (full_name, default_branch, 'addon.xml'), append_base=False)
@@ -255,12 +258,11 @@ def find_latest_release_zips(user, repo):
     return results
 
 def find_zips(user, repo=None):
+
     filters = {'Repository': '*repository*.zip', 'Feed': '*gitbrowser.feed*.zip', 'Installer': '*gitbrowser.installer*.zip', 'Music Plugin': '*plugin.audio*.zip', 'Video Plugin': '*plugin.video*.zip', 'Script': '*script*.zip'}
-    filter = kodi.get_property('search.filter')
-    if filter in filters:
-        q = filters[filter]
-    else:
-        q = '*.zip'
+
+    q = filters.get( kodi.get_property('search.filter'), '*.zip' )
+
     if repo is None:
         results = limit_versions(GH.request("/search/code", query={"per_page": page_limit, "q":"user:%s filename:%s" % (user, q)}, cache_limit=EXPIRE_TIMES.HOUR))
     else:

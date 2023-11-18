@@ -69,7 +69,10 @@ def search():
     def username():
         rtype = 'api'
         response = github.find_zips(q)
-        if response is None: return
+
+        if response is None:
+            return
+
         for r in github.sort_results(response['items']):
             url = github.get_download_url(r['repository']['full_name'], r['path'])
             menu = kodi.context_menu()
@@ -181,7 +184,7 @@ def install_feed():
         count = DB.query("SELECT count(1) FROM feed_subscriptions")
         kodi.set_setting('installed_feeds', str(count[0][0]))
         kodi.notify("Install Complete",'Feed Installed')
-    except:
+    except Exception:
         kodi.notify("Install failed",'Invalid Format.')
 
 def feed_count():
@@ -312,7 +315,8 @@ def install_batch():
 @kodi.register('new_feed')
 def new_feed():
     url = kodi.dialog_input('Feed URL')
-    if not url: return
+    if not url:
+        return
     DB.execute("INSERT INTO feed_subscriptions(url) VALUES(?)", [url])
     DB.commit()
     kodi.refresh()

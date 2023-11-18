@@ -34,9 +34,11 @@ class installerException(Exception):
 SOURCES = kodi.enum(DEFAULT=0, REPO=1, ZIP=2)
 
 def update_addons(quiet=True):
+
     from distutils.version import LooseVersion
     if not quiet:
         kodi.open_busy_dialog()
+
     sources = DB.query("SELECT addon_id, source FROM install_history")
     update_count = 0
     for source in sources:
