@@ -266,8 +266,9 @@ class GitHub_Installer():
 
     def enable_addon(self, addon_id):
         try:
-            if addon_id in ['xbmc.python', 'xbmc.gui'] or kodi.get_condition_visiblity(f'System.HasAddon({addon_id})') == 0:
+            if addon_id in ['xbmc.python', 'xbmc.gui']:
                 return True
+
             kodi.log("Enable Addon: %s" % addon_id)
             kodi.kodi_json_request("Addons.SetAddonEnabled", {"addonid": addon_id, "enabled": True})
         except Exception:

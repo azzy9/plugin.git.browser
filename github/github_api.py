@@ -141,10 +141,12 @@ def split_version(name):
     except Exception:
         return False, False
 
-def get_download_url(full_name, path):
+def get_download_url(full_name, path, branch=None, test_url=True):
+    if branch is None:
+        branch = default_branch
 
-    url = content_url % (full_name, default_branch, path)
-    if github.test_url(url):
+    url = content_url % (full_name, branch, path)
+    if test_url == False or github.test_url(url):
         return url
 
     # didn't work, need to get the branch name
@@ -253,6 +255,10 @@ def search(q, method=False):
 # TODO: used in github/github_installer.py, find out use
 #def find_xml(full_name):
 #    return GitHubWeb().request(content_url % (full_name, default_branch, 'addon.xml'), append_base=False)
+
+def get_repo_filelist(user, repo, branch):
+    results = GH.request(f"/repos/{user}/{repo}/git/trees/{branch}?recursive=1", query={})
+    return results
 
 def find_latest_release_zips(user, repo):
     results = GH.request(f"/repos/{user}/{repo}/releases/latest", query={})

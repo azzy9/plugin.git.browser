@@ -89,6 +89,7 @@ def search():
 
     @dispatcher.register('repository')
     def repository():
+        import os
 
         rtype = 'api'
         results = github.search(q, 'title')
@@ -99,15 +100,25 @@ def search():
         for i in results['items']:
             user = i['owner']['login']
 
+            # Lookup newest release zip files for this repo
             response = github.find_latest_release_zips(user, i['name'])
 
-            if response is None or response.get('message') is not None:
-                continue
+            if response is not None and response.get('message') is None:
+                for r in github.sort_results(response['assets']):
+                    url = r['browser_download_url']
+                    menu = kodi.context_menu()
+                    kodi.add_menu_item({'mode': 'github_install', "url": url, "user": user, "file": r['name'], "full_name": "%s/%s" % (user, i['name'])}, {'title': f"{user}/{i['name']}/{r['name']}"}, menu=menu, icon='null')
 
-            for r in github.sort_results(response['assets']):
-                url = r['browser_download_url']
-                menu = kodi.context_menu()
-                kodi.add_menu_item({'mode': 'github_install', "url": url, "user": user, "file": r['name'], "full_name": "%s/%s" % (user, i['name'])}, {'title': f"{user}/{i['name']}/{r['name']}"}, menu=menu, icon='null')
+            # Get the complete list of files for the main branch of this repo
+            response = github.get_repo_filelist(user, i['name'], i['default_branch'])
+
+            if response is not None and response.get('tree') is not None:
+                for r in response['tree']:
+                    if r['path'].endswith('.zip'):
+                        url = github.get_download_url(user + '/' + i['name'], r['path'], i['default_branch'], False)
+                        file_name = os.path.basename(r['path'])
+                        menu = kodi.context_menu()
+                        kodi.add_menu_item({'mode': 'github_install', "url": url, "user": user, "file": file_name, "full_name": "%s/%s" % (user, i['name'])}, {'title': f"{user}/{i['name']}/{file_name}"}, menu=menu, icon='null')
 
     @dispatcher.register('addonid')
     def addonid():
