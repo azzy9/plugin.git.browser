@@ -74,7 +74,8 @@ def dependency_search():
 @kodi.register('search')
 def search():
     q = kodi.arg('query') if kodi.arg('query') else kodi.dialog_input('Search GitHub')
-    if q in [None, False, '']: return False
+    if q in [None, False, '']:
+        return False
     DB.execute('REPLACE INTO search_history(search_type, query) VALUES(?,?)', [kodi.arg('type'), q])
     DB.commit()
 
@@ -137,7 +138,8 @@ def search():
     def addonid():
         rtype = 'api'
         results = github.search(q, 'id')
-        if results is None: return
+        if results is None:
+            return
         results.sort(key=lambda x:github.version_sort(x['name']), reverse=True)
 
         for i in results:
@@ -195,9 +197,11 @@ def install_feed():
         xml = github.install_feed(url)
     else:
         url = kodi.dialog_browser('Select a feed file',type=kodi.BROWSER_TYPES.FILE, mask='.zip')
-        if not github.re_feed.search(url): return
+        if not github.re_feed.search(url):
+            return
         xml = github.install_feed(url, True)
-    if not kodi.dialog_confirm('Install Feed?', "Click YES to proceed."): return
+    if not kodi.dialog_confirm('Install Feed?', "Click YES to proceed."):
+        return
 
     try:
         for f in xml.findAll('feeds'):
@@ -259,12 +263,14 @@ def install_batch():
     for a in xml.findAll('addon'):
         addon_id = a.find('addon_id')
         username = a.find('username')
-        if addon_id is None or username is None: continue
+        if addon_id is None or username is None:
+            continue
         username = username.text
         addon_id = addon_id.text
         PB.next(addon_id)
         if not kodi.has_addon(addon_id):
-            if PB.is_canceled(): return
+            if PB.is_canceled():
+                return
             kodi.log("Batch install " + addon_id)
             url, filename, full_name, version = github.find_zip(username, addon_id)
             if url:
@@ -376,7 +382,8 @@ def github_install():
     import re
     from github import github_installer
     c = kodi.dialog_confirm("Confirm Install", kodi.arg('file'), yes="Install", no="Cancel")
-    if not c: return
+    if not c:
+        return
     addon_id = re.sub("-[\d\.]+zip$", "", kodi.arg('file'))
     github_installer.GitHub_Installer(addon_id, kodi.arg('url'), kodi.arg('full_name'), kodi.vfs.join("special://home", "addons"))
 
@@ -394,7 +401,8 @@ def browse_repository():
 
 @kodi.register('history_delete', False)
 def history_delete():
-    if not kodi.arg('id'): return
+    if not kodi.arg('id'):
+        return
     DB.execute("DELETE FROM search_history WHERE search_id=?", [kodi.arg('id')])
     DB.commit()
     kodi.refresh()
@@ -405,7 +413,8 @@ def update_addons():
     quiet = True if kodi.arg('quiet') == 'quiet' else False
     if not quiet:
         c = kodi.dialog_confirm("Confirm Update", "Check for updates", yes="Update", no="Cancel")
-        if not c: return
+        if not c:
+            return
     github_installer.update_addons(quiet)
 
 if __name__ == '__main__':
