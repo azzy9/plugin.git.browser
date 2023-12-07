@@ -11,7 +11,7 @@
 		<setting default="0" id="last_about" type="number" visible="false"></setting>
 	</category>
 	<category label="General">
-		<setting id="disable_about" type="bool" label="Disable instructions dialog" default="false" visibile="true"/>
+		<setting id="disable_about" type="bool" label="Disable instructions dialog" default="false" visible="true"/>
 		<setting id="access_token" type="text" label="Personal Access Token" default="" visible="true" />
 		<setting id="page_limit" type="number" label="Search Limit" default="100" visible="true" />
 	</category>
@@ -20,16 +20,13 @@
 		<setting id="source_user" type="bool" label="User Repository on GitHub" default="true" visible="true"/>
 		<setting id="source_github" type="bool" label="GitHub Search" default="false" visible="true" />
 		<setting type="sep"></setting>
-		<setting id="install_optional" type="bool" label="Install optional dependencies" default="false" visibile="true"/>
-		<setting id="prompt_optional" type="bool" label="Prompt for Install" default="false" visibile="true" subsetting="true" enable="eq(-1,true)"/>
+		<setting id="install_optional" type="bool" label="Install optional dependencies" default="false" visible="true"/>
+		<setting id="prompt_optional" type="bool" label="Prompt for Install" default="false" visible="true" subsetting="true" enable="eq(-1,true)"/>
 	</category>
-	
-	<category label="Update Service">
+	<category label="Testing">
+		<setting id="testing_enabled" type="bool" label="Testing" default="false" visible="true"/>
 		<setting label="The update service is experimental" type="lsep"></setting>
 		<setting label="Enable at your own risk!" type="lsep"></setting>
 		<setting id="enable_updates" type="bool" label="Enable Automatic Updates" default="false" enable="true"/>  <--! This is not yet supported, you may enable at your own risk -->
 	</category>
 </settings>
-
-
-
