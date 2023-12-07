@@ -15,15 +15,28 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *'''
 
+import xbmcaddon
+
 import github
 from github import *
 
+ADDON = xbmcaddon.Addon()
+
+# check if we have allowed testing, this allowes normal users not to stumble across non-working sections
+TESTING_ENABLED = ADDON.getSetting('testing_enabled') == 'true'
+
 @kodi.register('main')
 def main():
-    kodi.add_menu_item({'mode': 'search_menu', 'type': "username", 'title': "Search by GitHub Username"}, {'title': "Search by GitHub Username"}, icon='username.png')
+
+    if TESTING_ENABLED:
+        kodi.add_menu_item({'mode': 'search_menu', 'type': "username", 'title': "Search by GitHub Username"}, {'title': "Search by GitHub Username"}, icon='username.png')
+
     kodi.add_menu_item({'mode': 'search_menu', 'type': "repository", 'title': "Search by GitHub Repository Title"}, {'title': "Search by GitHub Repository Title [COLOR red](Advanced)[/COLOR]"}, icon='repository.png')
-    kodi.add_menu_item({'mode': 'search_menu', 'type': "addonid",'title': "Search by Addon ID"}, {'title': "Search by Addon ID [COLOR red](Advanced)[/COLOR]"}, icon='addonid.png')
-    kodi.add_menu_item({'mode': 'feed_menu'}, {'title': "Search Feeds"}, icon='search_feeds.png')
+
+    if TESTING_ENABLED:
+        kodi.add_menu_item({'mode': 'search_menu', 'type': "addonid",'title': "Search by Addon ID"}, {'title': "Search by Addon ID [COLOR red](Advanced)[/COLOR]"}, icon='addonid.png')
+        kodi.add_menu_item({'mode': 'feed_menu'}, {'title': "Search Feeds"}, icon='search_feeds.png')
+
     kodi.add_menu_item({'mode': 'installer_menu'}, {'title': "Batch Installers"}, icon='batch_installer.png')
     kodi.add_menu_item({'mode': 'settings_menu'}, {'title': "Tools and Settings"}, icon='settings.png')
 
