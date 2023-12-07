@@ -277,12 +277,15 @@ def find_zips(user, repo=None):
     return results
 
 def find_zip(user, addon_id):
-    results = []
+
     response = GH.request("/search/code", query={"q": "user:%s filename:%s*.zip" % (user, addon_id)}, cache_limit=EXPIRE_TIMES.HOUR)
+
     if response is None:
         return False, False, False
+
     if response['total_count'] > 0:
         test = re.compile("%s(-.+\.zip|\.zip)$" % addon_id, re.IGNORECASE)
+
         def sort_results(name):
             version = get_version_by_name(name)
             return LooseVersion(version)
@@ -294,13 +297,15 @@ def find_zip(user, addon_id):
                 url = get_download_url(r['repository']['full_name'], r['path'])
                 version = get_version_by_name(r['path'])
                 return url, r['name'], r['repository']['full_name'], version
+
     return False, False, False, False
 
 
 def browse_repository(url):
-    import requests
+
     from commoncore import zipfile
     from bs4 import BeautifulSoup
+
     r = requests.get(url, stream=True)
     if kodi.strings.PY2:
         import StringIO
@@ -317,7 +322,7 @@ def browse_repository(url):
     return False
 
 def install_feed(url, local=False):
-    import requests
+
     from commoncore import zipfile
     if kodi.strings.PY2:
         from StringIO import StringIO as byte_reader
@@ -325,6 +330,7 @@ def install_feed(url, local=False):
         from io import BytesIO as byte_reader
 
     from bs4 import BeautifulSoup
+
     if local:
         r = kodi.vfs.open(url, "r")
         if kodi.strings.PY2:
@@ -342,8 +348,9 @@ def install_feed(url, local=False):
     return False
 
 def batch_installer(url, local=False):
-    import requests
+
     from commoncore import zipfile
+
     if kodi.strings.PY2:
         from StringIO import StringIO as byte_reader
     else:
