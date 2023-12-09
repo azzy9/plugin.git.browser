@@ -16,6 +16,7 @@
 *'''
 
 import xbmcaddon
+import xbmcvfs
 
 import github
 from github import *
@@ -39,6 +40,7 @@ def main():
         kodi.add_menu_item({'mode': 'search_menu', 'type': "addonid",'title': "Search by Addon ID"}, {'title': "Search by Addon ID"}, icon='addonid.png')
         kodi.add_menu_item({'mode': 'feed_menu'}, {'title': "Search Feeds"}, icon='search_feeds.png')
 
+    kodi.add_menu_item({'mode': 'user_list_menu'}, {'title': "Search from list"})
     kodi.add_menu_item({'mode': 'installer_menu'}, {'title': "Batch Installers"}, icon='batch_installer.png')
     kodi.add_menu_item({'mode': 'settings_menu'}, {'title': "Tools and Settings"}, icon='settings.png')
 
@@ -76,6 +78,21 @@ def feed_menu():
         else: title = name
         menu.add('Delete Feed', {"mode": "delete_feed", "title": title, "id": feed['feed_id']})
         kodi.add_menu_item({'mode': 'list_feed', 'url': feed['url']}, {'title': title}, menu=menu, icon='null')
+
+@kodi.register('user_list_menu')
+def user_list():
+
+    """
+    Creates user list menu
+    A list compiled to make users life easier
+    will only contain legal plugins
+    """
+    menu = kodi.context_menu()
+    with open( xbmcvfs.translatePath( 'special://home/addons/plugin.git.browser/resources/user_lists.txt' ), 'r', encoding='utf8' ) as users:
+        if users:
+            users = users.read().split("\n")
+            for user in users:
+                kodi.add_menu_item({'mode': 'search', 'type': 'repository', 'query': str( user )}, {'title': str( user )}, menu=menu, icon='null')
 
 @kodi.register('installer_menu')
 def installer_menu():

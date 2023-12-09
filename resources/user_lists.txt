@@ -1,0 +1,6 @@
+accumulator/plugin.video.lbry
+azzy9/plugin.git.browser
+azzy9/plugin.video.lbryplus
+azzy9/plugin.video.rumble
+azzy9/plugin.video.wedotv
+winsomehax/plugin.video.bitchute
