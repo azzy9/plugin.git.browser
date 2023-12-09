@@ -31,10 +31,10 @@ def main():
     if TESTING_ENABLED:
         kodi.add_menu_item({'mode': 'search_menu', 'type': "username", 'title': "Search by GitHub Username"}, {'title': "Search by GitHub Username"}, icon='username.png')
 
-    kodi.add_menu_item({'mode': 'search_menu', 'type': "repository", 'title': "Search by GitHub Repository Title"}, {'title': "Search by GitHub Repository Title [COLOR red](Advanced)[/COLOR]"}, icon='repository.png')
+    kodi.add_menu_item({'mode': 'search_menu', 'type': "repository", 'title': "Search by GitHub Repository Title"}, {'title': "Search by GitHub Repository Title"}, icon='repository.png')
 
     if TESTING_ENABLED:
-        kodi.add_menu_item({'mode': 'search_menu', 'type': "addonid",'title': "Search by Addon ID"}, {'title': "Search by Addon ID [COLOR red](Advanced)[/COLOR]"}, icon='addonid.png')
+        kodi.add_menu_item({'mode': 'search_menu', 'type': "addonid",'title': "Search by Addon ID"}, {'title': "Search by Addon ID"}, icon='addonid.png')
         kodi.add_menu_item({'mode': 'feed_menu'}, {'title': "Search Feeds"}, icon='search_feeds.png')
 
     kodi.add_menu_item({'mode': 'installer_menu'}, {'title': "Batch Installers"}, icon='batch_installer.png')
@@ -123,16 +123,18 @@ def search():
                     menu = kodi.context_menu()
                     kodi.add_menu_item({'mode': 'github_install', "url": url, "user": user, "file": r['name'], "full_name": "%s/%s" % (user, i['name'])}, {'title': f"{user}/{i['name']}/{r['name']}"}, menu=menu, icon='null')
 
-            # Get the complete list of files for the main branch of this repo
-            response = github.get_repo_filelist(user, i['name'], i['default_branch'])
+            else:
 
-            if response is not None and response.get('tree') is not None:
-                for r in response['tree']:
-                    if r['path'].endswith('.zip'):
-                        url = github.get_download_url(user + '/' + i['name'], r['path'], i['default_branch'], False)
-                        file_name = os.path.basename(r['path'])
-                        menu = kodi.context_menu()
-                        kodi.add_menu_item({'mode': 'github_install', "url": url, "user": user, "file": file_name, "full_name": "%s/%s" % (user, i['name'])}, {'title': f"{user}/{i['name']}/{file_name}"}, menu=menu, icon='null')
+                # Get the complete list of files for the main branch of this repo
+                response = github.get_repo_filelist(user, i['name'], i['default_branch'])
+
+                if response is not None and response.get('tree') is not None:
+                    for r in response['tree']:
+                        if r['path'].endswith('.zip'):
+                            url = github.get_download_url(user + '/' + i['name'], r['path'], i['default_branch'], False)
+                            file_name = os.path.basename(r['path'])
+                            menu = kodi.context_menu()
+                            kodi.add_menu_item({'mode': 'github_install', "url": url, "user": user, "file": file_name, "full_name": "%s/%s" % (user, i['name'])}, {'title': f"{user}/{i['name']}/{file_name}"}, menu=menu, icon='null')
 
     @dispatcher.register('addonid')
     def addonid():
