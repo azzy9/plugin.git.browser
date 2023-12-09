@@ -28,6 +28,8 @@ TESTING_ENABLED = ADDON.getSetting('testing_enabled') == 'true'
 @kodi.register('main')
 def main():
 
+    """ Main Menu """
+
     if TESTING_ENABLED:
         kodi.add_menu_item({'mode': 'search_menu', 'type': "username", 'title': "Search by GitHub Username"}, {'title': "Search by GitHub Username"}, icon='username.png')
 
@@ -40,14 +42,11 @@ def main():
     kodi.add_menu_item({'mode': 'installer_menu'}, {'title': "Batch Installers"}, icon='batch_installer.png')
     kodi.add_menu_item({'mode': 'settings_menu'}, {'title': "Tools and Settings"}, icon='settings.png')
 
-@kodi.register('settings_menu')
-def settings_menu():
-    kodi.add_menu_item({'mode': 'dependency_search'}, {'title': "Search for missing dependencies"}, icon='search_failed.png')
-    kodi.add_menu_item({'mode': 'update_addons'}, {'title': "Check for Updates [COLOR red](Advanced)[/COLOR]"}, icon='update.png', visible=kodi.get_setting('enable_updates') == 'true')
-    kodi.add_menu_item({'mode': 'addon_settings'}, {'title': "Addon Settings"}, icon='settings.png')
-
 @kodi.register('search_menu')
 def search_menu():
+
+    """ Creates search menu """
+
     menu = kodi.context_menu()
     menu.add('Search Filter', {"mode": "search_filter"})
     kodi.add_menu_item({'mode': 'void'}, {'title': "[COLOR darkorange]%s[/COLOR]" % kodi.arg('title')}, icon='null', menu=menu)
@@ -59,6 +58,41 @@ def search_menu():
             menu.add('Search Filter', {"mode": "search_filter"})
             menu.add('Delete from search history', {"mode": "history_delete", "id": result['search_id']})
             kodi.add_menu_item({'mode': 'search', 'type': kodi.arg('type'), 'query': result['query']}, {'title': result['query']}, menu=menu, icon='null')
+
+@kodi.register('feed_menu')
+def feed_menu():
+
+    """ Creates feed menu """
+
+    kodi.add_menu_item({'mode': 'install_local_feed'}, {'title': "*** Local Search Feed File ***"}, icon='install_feed_local.png')
+    #kodi.add_menu_item({'mode': 'search', 'query': 'gitbrowser.feed', 'type': 'addonid'}, {'title': "*** Search for Feeds ***"}, icon='null')
+    feeds = DB.query_assoc("SELECT feed_id, name, url, enabled FROM feed_subscriptions")
+    for feed in feeds:
+        menu = kodi.ContextMenu()
+
+        name = feed['name'] if feed['name'] else feed['url']
+        if not feed['enabled']:
+            title = "[COLOR darkred]%s[/COLOR]" % name
+        else: title = name
+        menu.add('Delete Feed', {"mode": "delete_feed", "title": title, "id": feed['feed_id']})
+        kodi.add_menu_item({'mode': 'list_feed', 'url': feed['url']}, {'title': title}, menu=menu, icon='null')
+
+@kodi.register('installer_menu')
+def installer_menu():
+
+    """ Creates installer menu """
+
+    kodi.add_menu_item({'mode': 'browse_local'}, {'title': "*** Install From Local File ***"}, icon='install_batch_local.png')
+    #kodi.add_menu_item({'mode': 'search', 'query': 'gitbrowser.installer', 'type': 'addonid'}, {'title': "*** Search for Batch Installers ***"}, icon='null')
+
+@kodi.register('settings_menu')
+def settings_menu():
+
+    """ Creates settings menu """
+
+    kodi.add_menu_item({'mode': 'dependency_search'}, {'title': "Search for missing dependencies"}, icon='search_failed.png')
+    kodi.add_menu_item({'mode': 'update_addons'}, {'title': "Check for Updates [COLOR red](Advanced)[/COLOR]"}, icon='update.png', visible=kodi.get_setting('enable_updates') == 'true')
+    kodi.add_menu_item({'mode': 'addon_settings'}, {'title': "Addon Settings"}, icon='settings.png')
 
 @kodi.register('dependency_search')
 def dependency_search():
@@ -170,27 +204,6 @@ def search_filter():
             kodi.set_property('search.filter', '')
         else:
             kodi.set_property('search.filter', options[c])
-
-@kodi.register('feed_menu')
-def feed_menu():
-    kodi.add_menu_item({'mode': 'install_local_feed'}, {'title': "*** Local Search Feed File ***"}, icon='install_feed_local.png')
-    #kodi.add_menu_item({'mode': 'search', 'query': 'gitbrowser.feed', 'type': 'addonid'}, {'title': "*** Search for Feeds ***"}, icon='null')
-    feeds = DB.query_assoc("SELECT feed_id, name, url, enabled FROM feed_subscriptions")
-    for feed in feeds:
-        menu = kodi.ContextMenu()
-
-        name = feed['name'] if feed['name'] else feed['url']
-        if not feed['enabled']:
-            title = "[COLOR darkred]%s[/COLOR]" % name
-        else: title = name
-        menu.add('Delete Feed', {"mode": "delete_feed", "title": title, "id": feed['feed_id']})
-        kodi.add_menu_item({'mode': 'list_feed', 'url': feed['url']}, {'title': title}, menu=menu, icon='null')
-
-@kodi.register('installer_menu')
-def installer_menu():
-    kodi.add_menu_item({'mode': 'browse_local'}, {'title': "*** Install From Local File ***"}, icon='install_batch_local.png')
-    #kodi.add_menu_item({'mode': 'search', 'query': 'gitbrowser.installer', 'type': 'addonid'}, {'title': "*** Search for Batch Installers ***"}, icon='null')
-
 
 @kodi.register(['install_feed', 'install_local_feed'], False)
 def install_feed():
