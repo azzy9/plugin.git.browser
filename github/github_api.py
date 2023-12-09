@@ -73,22 +73,29 @@ class GitHubAPI(CACHABLE_API):
         return url
 
     def handle_error(self, error, response, request_args, request_kwargs):
-    
+
+        """ Handles request errors """
+
         if response.status_code == 401:
             traceback.print_stack()
             kodi.close_busy_dialog()
             raise githubException("Unauthorized: %s" % error)
-        elif response.status_code == 403 and 'X-RateLimit-Reset' in response.headers:
+
+        if response.status_code == 403 and 'X-RateLimit-Reset' in response.headers:
             import time
             retry = int(response.headers['X-RateLimit-Reset']) - int(time.time())
             for delay in range(retry, 0, -1):
                 kodi.notify("API Rate limit exceeded", "Retry in %s seconds(s)" % delay, timeout=1000)
                 kodi.sleep(1000)
             return self.request(*request_args, **request_kwargs)
-        elif response.status_code == 422 and 'Only the first 1000' in response.text:
+
+        if response.status_code == 422 and 'Only the first 1000' in response.text:
             kodi.handle_error('Result count exceeds API limit.', 'Try different search or result filter.')
             kodi.close_busy_dialog()
             traceback.print_stack()
+        elif response.status_code == 409:
+            # returns 409 if empty
+            return None
         else:
             kodi.close_busy_dialog()
             traceback.print_stack()
