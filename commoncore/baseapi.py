@@ -65,6 +65,7 @@ class BASE_API():
         'Content-Type': 'text/html; charset=UTF-8',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
     }
+    default_headers = {}
     timeout = 3
 
     def get_user_agent(self):
