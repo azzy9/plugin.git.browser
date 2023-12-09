@@ -244,10 +244,10 @@ def limit_versions(results):
 def search(q, method=False):
 
     if method=='user':
-        return GH.request("/search/repositories", query={"per_page": page_limit, "q": "user:%s" % q}, cache_limit=EXPIRE_TIMES.HOUR)
+        return GH.request("/search/repositories", query={"per_page": page_limit, "q": "user:%s fork:true" % q}, cache_limit=EXPIRE_TIMES.HOUR)
 
     if method=='title':
-        return GH.request("/search/repositories", query={"per_page": page_limit, "q": "in:name %s" % q}, cache_limit=EXPIRE_TIMES.HOUR)
+        return GH.request("/search/repositories", query={"per_page": page_limit, "q": "in:name %s fork:true" % q}, cache_limit=EXPIRE_TIMES.HOUR)
 
     if method == 'id':
         results = []

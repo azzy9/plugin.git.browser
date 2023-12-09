@@ -15,6 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *'''
 
+import os
+
 import xbmcaddon
 import xbmcvfs
 
@@ -31,9 +33,8 @@ def main():
 
     """ Main Menu """
 
-    if TESTING_ENABLED:
-        kodi.add_menu_item({'mode': 'search_menu', 'type': "username", 'title': "Search by GitHub Username"}, {'title': "Search by GitHub Username"}, icon='username.png')
 
+    kodi.add_menu_item({'mode': 'search_menu', 'type': "username", 'title': "Search by GitHub Username"}, {'title': "Search by GitHub Username"}, icon='username.png')
     kodi.add_menu_item({'mode': 'search_menu', 'type': "repository", 'title': "Search by GitHub Repository Title"}, {'title': "Search by GitHub Repository Title"}, icon='repository.png')
 
     if TESTING_ENABLED:
@@ -132,31 +133,40 @@ def search():
 
     @dispatcher.register('username')
     def username():
-        rtype = 'api'
-        response = github.find_zips(q)
 
-        if response is None:
+        results = github.search(q, 'user')
+
+        if results is None:
             return
 
-        for r in github.sort_results(response['items']):
-            url = github.get_download_url(r['repository']['full_name'], r['path'])
-            menu = kodi.context_menu()
-            if r['is_repository']:
-                menu.add('Browse Repository Contents', {"mode": "browse_repository", "url": url, "file": r['name'], "full_name": "%s/%s" % (q, r['repository']['name'])})
-            if r['is_feed']:
-                r['display'] = "[COLOR yellow]%s[/COLOR]" % r['name']
-                kodi.add_menu_item({'mode': 'install_feed', "url": url}, {'title': r['name'], 'display': r['display']}, menu=menu, icon='null')
-            elif r['is_installer']:
-                r['display'] = "[COLOR orange]%s[/COLOR]" % r['name']
-                kodi.add_menu_item({'mode': 'install_batch', "url": url}, {'title': r['name'], 'display': r['display']}, menu=menu, icon='null')
+        for i in results['items']:
+            user = i['owner']['login']
+
+            # Lookup newest release zip files for this repo
+            response = github.find_latest_release_zips(user, i['name'])
+
+            if response is not None and response.get('message') is None:
+                for r in github.sort_results(response['assets']):
+                    url = r['browser_download_url']
+                    menu = kodi.context_menu()
+                    kodi.add_menu_item({'mode': 'github_install', "url": url, "user": user, "file": r['name'], "full_name": "%s/%s" % (user, i['name'])}, {'title': f"{user}/{i['name']}/{r['name']}"}, menu=menu, icon='null')
+
             else:
-                kodi.add_menu_item({'mode': 'github_install', "url": url, "user": q, "file": r['name'], "full_name": "%s/%s" % (q, r['repository']['name'])}, {'title': r['name']}, menu=menu, icon='null')
+
+                # Get the complete list of files for the main branch of this repo
+                response = github.get_repo_filelist(user, i['name'], i['default_branch'])
+
+                if response is not None and response.get('tree') is not None:
+                    for r in response['tree']:
+                        if r['path'].endswith('.zip'):
+                            url = github.get_download_url(user + '/' + i['name'], r['path'], i['default_branch'], False)
+                            file_name = os.path.basename(r['path'])
+                            menu = kodi.context_menu()
+                            kodi.add_menu_item({'mode': 'github_install', "url": url, "user": user, "file": file_name, "full_name": "%s/%s" % (user, i['name'])}, {'title': f"{user}/{i['name']}/{file_name}"}, menu=menu, icon='null')
 
     @dispatcher.register('repository')
     def repository():
-        import os
 
-        rtype = 'api'
         results = github.search(q, 'title')
 
         if results is None:
