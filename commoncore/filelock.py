@@ -29,13 +29,13 @@
 A platform independent file lock that supports the with-statement.
 """
 
-
 # Modules
 # ------------------------------------------------
 #import kodi
 import os
 import threading
 import time
+
 try:
     import warnings
 except ImportError:
@@ -106,9 +106,11 @@ class Timeout(TimeoutError):
 # Classes
 # ------------------------------------------------
 class BaseFileLock(object):
+
     """ Implements the base class of a file lock. """
 
     def __init__(self, lock_file, timeout = -1):
+
         """ init """
 
         # The path to the lock file.
@@ -136,9 +138,8 @@ class BaseFileLock(object):
 
     @property
     def lock_file(self):
-        """
-        The path to the lock file.
-        """
+
+        """ The path to the lock file. """
         return self._lock_file
 
     @property
@@ -159,8 +160,7 @@ class BaseFileLock(object):
 
     @timeout.setter
     def timeout(self, value):
-        """
-        """
+        """ Timeout method """
         self._timeout = float(value)
         return None
 
@@ -335,6 +335,7 @@ class BaseFileLock(object):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class WindowsFileLock(BaseFileLock):
+
     """
     Uses the :func:`msvcrt.locking` function to hard lock the lock file on
     windows systems.
@@ -407,6 +408,7 @@ class UnixFileLock(BaseFileLock):
 # ~~~~~~~~~
 
 class SoftFileLock(BaseFileLock):
+
     """
     Simply watches the existence of the lock file.
     """

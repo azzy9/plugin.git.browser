@@ -42,8 +42,27 @@ try:
 except Exception:
     str_type = str
 
-TYPES = kodi.enum(TEXT=str_type, STR=type(''), UTF8=type(u''), DICT=type({}), RESPONSE=requests.models.Response)
-EXPIRE_TIMES = kodi.enum(FLUSH=-2, NEVER=-1, FIFTEENMIN=.25, THIRTYMIN=.5, HOUR=1, FOURHOURS=4, EIGHTHOURS=8, TWELVEHOURS=12, DAY=24, THREEDAYS=72, WEEK=168)
+TYPES = kodi.enum(
+    TEXT=str_type,
+    STR=type(''),
+    UTF8=type(u''),
+    DICT=type({}),
+    RESPONSE=requests.models.Response
+)
+
+EXPIRE_TIMES = kodi.enum(
+    FLUSH=-2,
+    NEVER=-1,
+    FIFTEENMIN=.25,
+    THIRTYMIN=.5,
+    HOUR=1,
+    FOURHOURS=4,
+    EIGHTHOURS=8,
+    TWELVEHOURS=12,
+    DAY=24,
+    THREEDAYS=72,
+    WEEK=168
+)
 
 class baseException(Exception):
     pass

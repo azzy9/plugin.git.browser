@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-'''*
+'''
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*'''
+'''
 
 import os
 
@@ -32,7 +32,6 @@ TESTING_ENABLED = ADDON.getSetting('testing_enabled') == 'true'
 def main():
 
     """ Main Menu """
-
 
     kodi.add_menu_item({'mode': 'search_menu', 'type': "username", 'title': "Search by GitHub Username"}, {'title': "Search by GitHub Username"}, icon='username.png')
     kodi.add_menu_item({'mode': 'search_menu', 'type': "repository", 'title': "Search by GitHub Repository Title"}, {'title': "Search by GitHub Repository Title"}, icon='repository.png')
@@ -285,7 +284,10 @@ def install_batch():
             return
         xml, zip_ref = github.batch_installer(url, True)
 
-    if not kodi.dialog_confirm('Batch Installer?', "Click YES to proceed.", "This will install a list of addons.", "Some configuration files and settings may be overwritten."):
+    if not kodi.dialog_confirm(
+        'Batch Installer?', "Click YES to proceed.", "This will install a list of addons.",
+        "Some configuration files and settings may be overwritten."
+    ):
         return
 
     if not xml:
@@ -373,7 +375,11 @@ def install_batch():
         kodi.dialog_ok("Batch Error", "One or more Addons failed to install", "See log for list")
         kodi.log("Failed list: %s" % ",".join(failed_list))
 
-    r = kodi.dialog_confirm(kodi.get_name(), 'Click Continue to install more addons or', 'Restart button to finalize addon installation', yes='Restart', no='Continue')
+    r = kodi.dialog_confirm(
+            kodi.get_name(), 'Click Continue to install more addons or',
+            'Restart button to finalize addon installation',
+            yes='Restart', no='Continue'
+        )
 
     if r:
         import sys
@@ -386,17 +392,21 @@ def install_batch():
 
 @kodi.register('new_feed')
 def new_feed():
+
     url = kodi.dialog_input('Feed URL')
     if not url:
         return
+
     DB.execute("INSERT INTO feed_subscriptions(url) VALUES(?)", [url])
     DB.commit()
     kodi.refresh()
 
 @kodi.register('delete_feed', False)
 def delete_feed():
+
     if not kodi.dialog_confirm('Delete Feed?', kodi.arg('title'), "Click YES to proceed."):
         return
+
     DB.execute("DELETE FROM feed_subscriptions WHERE feed_id=?", [kodi.arg('id')])
     DB.commit()
     kodi.refresh()
@@ -421,11 +431,18 @@ def feed_list():
 
 @kodi.register('github_install', False)
 def github_install():
+
     import re
     from github import github_installer
-    c = kodi.dialog_confirm("Confirm Install", kodi.arg('file'), yes="Install", no="Cancel")
-    if not c:
+
+    confirmed = kodi.dialog_confirm(
+        "Confirm Install", kodi.arg('file'),
+        yes="Install", no="Cancel"
+    )
+
+    if not confirmed:
         return
+
     addon_id = re.sub("-[\d\.]+zip$", "", kodi.arg('file'))
     github_installer.GitHub_Installer(addon_id, kodi.arg('url'), kodi.arg('full_name'), kodi.vfs.join("special://home", "addons"))
 
@@ -443,20 +460,30 @@ def browse_repository():
 
 @kodi.register('history_delete', False)
 def history_delete():
+
     if not kodi.arg('id'):
         return
+
     DB.execute("DELETE FROM search_history WHERE search_id=?", [kodi.arg('id')])
     DB.commit()
     kodi.refresh()
 
 @kodi.register('update_addons', False)
 def update_addons():
+
     from github import github_installer
-    quiet = True if kodi.arg('quiet') == 'quiet' else False
+
+    quiet = kodi.arg('quiet') == 'quiet'
     if not quiet:
-        c = kodi.dialog_confirm("Confirm Update", "Check for updates", yes="Update", no="Cancel")
-        if not c:
+
+        confirmed = kodi.dialog_confirm(
+            "Confirm Update", "Check for updates",
+            yes="Update", no="Cancel"
+        )
+
+        if not confirmed:
             return
+
     github_installer.update_addons(quiet)
 
 if __name__ == '__main__':

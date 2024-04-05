@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-'''*
+'''
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*'''
+'''
 
 import re
 from commoncore import kodi
@@ -144,6 +144,7 @@ class BASEDatabase:
                 kodi.log("Database Error: %s" % err_str)
 
     def run_script(self, sql_file, commit=True):
+
         if kodi.vfs.exists(sql_file):
             full_sql = kodi.vfs.read_file(sql_file)
             sql_stmts = full_sql.split(';')
@@ -153,8 +154,8 @@ class BASEDatabase:
             if commit:
                 self.commit()
             return True
-        else:
-            return False
+
+        return False
 
 class SQLiteDatabase(BASEDatabase):
     db_lock = None
