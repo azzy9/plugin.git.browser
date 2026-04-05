@@ -69,3 +69,5 @@ DEFAULT_VIEWS = enum(
 )
 
 BROWSER_TYPES = enum(DIRECTORY=0, FILE=1, IMAGE=2, WRITEABLEDIRECTORY=3)
+
+KODI_VERSION = float(xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')[:4])

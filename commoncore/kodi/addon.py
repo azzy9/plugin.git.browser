@@ -298,7 +298,7 @@ def make_menu_item(query, infolabels, total_items=0, icon='', image='', fanart='
         listitem.setProperty('totaltime', '999999')
         listitem.setProperty('resumetime', "1")
         infolabels['playcount'] = 0
-    listitem.setInfo('video', dict2label(infolabels))
+    item_set_info( listitem, dict2label(infolabels) )
     listitem.setProperty('IsPlayable', 'false')
     listitem.setProperty('fanart_image', fanart)
     if menu is None:
@@ -317,3 +317,37 @@ def add_menu_item(query, infolabels, total_items=0, icon='', image='', fanart=''
 def add_video_item(query, infolabels, total_items=0, icon='', image='', fanart='', replace_menu=True, menu=None, format=None, random_url=True, in_progress=False):
     plugin_url, listitem = make_menu_item(query, infolabels, total_items, icon, image, fanart, replace_menu, menu, True, format, in_progress)
     xbmcplugin.addDirectoryItem(HANDLE_ID, plugin_url, listitem, isFolder=False, totalItems=total_items)
+
+def item_set_info( line_item, properties ):
+
+    """ line item set info """
+
+    if KODI_VERSION > 19.8:
+        vidtag = line_item.getVideoInfoTag()
+        if properties.get( 'year' ):
+            vidtag.setYear( int( properties.get( 'year' ) ) )
+        if properties.get( 'episode' ):
+            vidtag.setEpisode( properties.get( 'episode' ) )
+        if properties.get( 'season' ):
+            vidtag.setSeason( properties.get( 'season' ) )
+        if properties.get( 'plot' ):
+            vidtag.setPlot( properties.get( 'plot' ) )
+        if properties.get( 'title' ):
+            vidtag.setTitle( properties.get( 'title' ) )
+        if properties.get( 'studio' ):
+            vidtag.setStudios([ properties.get( 'studio' ) ])
+        if properties.get( 'writer' ):
+            vidtag.setWriters([ properties.get( 'writer' ) ])
+        if properties.get( 'duration' ):
+            vidtag.setDuration( int( properties.get( 'duration' ) ) )
+        if properties.get( 'tvshowtitle' ):
+            vidtag.setTvShowTitle( properties.get( 'tvshowtitle' ) )
+        if properties.get( 'mediatype' ):
+            vidtag.setMediaType( properties.get( 'mediatype' ) )
+        if properties.get('premiered'):
+            vidtag.setPremiered( properties.get( 'premiered' ) )
+        if properties.get('playcount'):
+            vidtag.setPlayCount( properties.get( 'playcount' ) )
+
+    else:
+        line_item.setInfo('video', properties)
