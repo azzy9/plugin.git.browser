@@ -485,6 +485,7 @@ def update_addons():
             return
 
     github_installer.update_addons(quiet)
+    kodi.refresh()
 
 if __name__ == '__main__':
     kodi.run()
